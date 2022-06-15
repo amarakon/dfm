@@ -61,8 +61,7 @@ prompt_copy() {
 		data3="$(file -b "$target" | cut -d ',' -f2 | cut -d ' ' -f3)"
 
 		{ [ "$data2" = "image" ] && program="xclip -i -selection clipboard -t image/png"; } ||
-		{ [ "$data2" = "text" ] && program="xclip -r -i -selection clipboard"; } ||
-		{ [ "$data3" = "text" ] && program="xclip -r -i -selection clipboard"; }
+		{ program="xclip -r -i -selection clipboard"; }
 
 		{ [ -n "${program+1}" ] && $program "$target"; } ||
 		{ echo "Failed to recognize file format"; }
@@ -97,20 +96,7 @@ prompt_program() {
 	    target="$newt"
 
 	    if [ ! -d "$target" ]; then		
-		data="$(file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f1)"
-		data2="$(file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2)"
-		data3="$(file -b "$target" | cut -d ',' -f2 | cut -d ' ' -f3)"
-
-		{ [ "$data" = "Matroska" ] && program="$PLAYER"; } ||
-		{ [ "$data2" = "audio" ] && program="$TERMINAL -e $PLAYER"; } ||
-		{ [ "$data2" = "document" ] && program="$READER"; } ||
-		{ [ "$data2" = "Word" ] && program="$OFFICE"; } ||
-		{ [ "$data2" = "image" ] && program="$VIEWER"; } ||
-		{ [ "$data2" = "text" ] && program="$TERMINAL -e $EDITOR"; } ||
-		{ [ "$data3" = "text" ] && program="$TERMINAL -e $EDITOR"; }
-
-		{ [ -n "${program+1}" ] && $program "$target"; } ||
-		{ echo "Failed to recognize file format"; }
+		xdg-open "$target"
 		exit 0
 		fi
 	fi
