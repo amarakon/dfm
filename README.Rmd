@@ -58,3 +58,8 @@ The default is the program option.
 `# root` eselect-repository remove -f amarlay
 `# root` emerge --sync
 ```
+
+# Credit
+
+This project is based on [clamiax/scripts](https://github.com/clamiax/scripts).
+It is based on the `dbrowse` script.

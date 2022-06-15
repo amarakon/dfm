@@ -11,6 +11,7 @@ DFM – Dmenu File Manager
 -   [Uninstallation](#uninstallation)
     -   [Universal](#universal-1)
     -   [Gentoo](#gentoo-1)
+-   [Credit](#credit)
 
 DFM is a simple file manager that uses Dmenu. Instead of opening a slow
 graphical environment, you open Dmenu and quickly choose whatever file
@@ -68,3 +69,9 @@ The default is the program option.
 `# root` eselect-repository remove -f amarlay
 `# root` emerge --sync
 ```
+
+## Credit
+
+This project is based on
+[clamiax/scripts](https://github.com/clamiax/scripts). It is based on
+the `dbrowse` script.
