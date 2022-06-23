@@ -13,10 +13,12 @@ DFM – Dmenu File Manager
     -   [Gentoo](#gentoo-1)
 -   [Credit](#credit)
 
+![](preview.png)
+
 DFM is a simple file manager that uses Dmenu. Instead of opening a slow
 graphical environment, you open Dmenu and quickly choose whatever file
 you want to manipulate. Unfortunately, it does not **yet** support
-multi-selection.
+multi-selection. I am planning on implementing it soon though.
 
 ## Usage
 
