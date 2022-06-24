@@ -7,24 +7,27 @@ output: amaryaml::github
 
 DFM is a simple file manager that uses Dmenu.
 Instead of opening a slow graphical environment, you open Dmenu and quickly choose whatever file you want to manipulate.
-Unfortunately, it does not **yet** support multi-selection.
-I am planning on implementing it soon though.
+It now supports multiselection, so you can manage multiple files.
 
 # Usage
 
-Use the `dfm` command to select any file.
-There are three options for DFM:
+```sh
+`# user` dfm --raw # Print the raw output of the selection
+`# user` dfm --copy # Copy the raw output of the selection
+`# user` dfm --copy-contents # Copy the contents of the selection
+`# user` dfm --program # Open the appropriate program for the selection
+```
 
-#. open the default program for the file (`-p`/`--program`)
-#. copy the contents of the file (`-c`/`--copy-file`)
-#. copy a line from the contents for the file (`-cf`/`--copy-file`)
-
-The default is the program option.
+The default is the `program` option.
 
 # Dependencies
 
-#. Dmenu
-#. Xclip (if you want to use the *copy* or *copy file* features.)
+#. dmenu
+#. xdg-utils
+#. gtk+
+#. xclip (if you want to use the *copy* or *copy contents* features.)
+
+Most of these will probably already be installed on your system, with the exception of Dmenu.
 
 # Installation
 
