@@ -11,13 +11,16 @@ main() {
     { prompt_program "$@"; } 
 }
 
+sedpwd() { sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@'; }
+sedquotes() { sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
+
 prompt_base() {
     target="$2"
     [ -z "$target" ] && target="`pwd`"
-    prompt="$3"
-    [ -z "$prompt" ] && prompt="`printf "$target" | sed 's|^/home/[^/]*|~|'`"
 
     while true; do
+	prompt="$3"
+	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@/home/'"$USER"'@~@'`"
 	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | dmenu -p "$prompt" -i -l 10)"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
@@ -32,8 +35,8 @@ prompt_base() {
 	if [ `ls | wc -l` -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ "`file -b "$target" |\
-		    rev | awk '{print $1,$2,$3,$4,$5}' | rev`" = "(No such file or directory)"\
+		if [ "`file -b "$target"\
+		    | rev | awk '{print $1,$2,$3,$4,$5}' | rev`" = "(No such file or directory)"\
 		    -a `echo "$target" | grep "*" | wc -l` -ge 1 ]
 		then
 		    target=`ls $target`
@@ -50,15 +53,14 @@ prompt_base() {
 }
 
 prompt_raw() {
-    cmd () { echo "$target" | sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@'; }
-    prompt_base
+    cmd () { echo "$target" | sedpwd; }
+    prompt_base "$@"
 }
 
 prompt_copy() {
     cmd() {
-	printf "$target" |\
-	sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@' | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | tr '\n' ' ' |\
-	xclip -r -i -selection clipboard
+	printf "$target" | sedpwd | sedquotes | tr '\n' ' '\
+	| xclip -r -i -selection clipboard
     }
     prompt_base
 }
@@ -70,17 +72,16 @@ prompt_copy_contents() {
 	else
 	    program="xclip -r -i -selection clipboard"
 	fi
-	printf "$target" | sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@' | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | xargs $program
+	printf "$target" | sedpwd | sedquotes | xargs $program
     }   
     prompt_base
 }
 
 prompt_program() {
     cmd() {
-	printf "$target" |\
-	sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@' | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" |\
-	xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache |\
-	cut -d '/' -f 1)/${target##*.})
+	printf "$target" | sedpwd | sedquotes\
+	| xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache\
+	| cut -d '/' -f 1)/${target##*.})
     }
     prompt_base
 }
