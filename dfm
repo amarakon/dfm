@@ -11,12 +11,11 @@ main() {
     { prompt_program "$@"; } 
 }
 
-sedpwd() { sed 's@^'"$PWD"/'@@' | sed 's@^@'"$PWD"/'@'; }
-sedquotes() { sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
+quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
     target="$2"
-    [ -z "$target" ] && target="`pwd`"
+    [ -z "$target" ] && target="$PWD"
 
     while true; do
 	prompt="$3"
@@ -39,9 +38,10 @@ prompt_base() {
 		    | rev | awk '{print $1,$2,$3,$4,$5}' | rev`" = "(No such file or directory)"\
 		    -a `echo "$target" | grep "*" | wc -l` -ge 1 ]
 		then
-		    target=`ls $target`
+		    target=`ls -d "$PWD"/$sel`
 		    cmd ; exit 0
 		else
+		    target=`printf "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
 		    cmd ; exit 0
 		fi
 	    else
@@ -53,14 +53,13 @@ prompt_base() {
 }
 
 prompt_raw() {
-    cmd () { echo "$target" | sedpwd; }
+    cmd () { quotes | xargs ls; }
     prompt_base "$@"
 }
 
 prompt_copy() {
     cmd() {
-	printf "$target" | sedpwd | sedquotes | tr '\n' ' '\
-	| xclip -r -i -selection clipboard
+	quotes | tr '\n' ' ' | xclip -r -i -selection clipboard
     }
     prompt_base
 }
@@ -72,14 +71,14 @@ prompt_copy_contents() {
 	else
 	    program="xclip -r -i -selection clipboard"
 	fi
-	printf "$target" | sedpwd | sedquotes | xargs $program
+	quotes | xargs $program
     }   
     prompt_base
 }
 
 prompt_program() {
     cmd() {
-	printf "$target" | sedpwd | sedquotes\
+	quotes\
 	| xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache\
 	| cut -d '/' -f 1)/${target##*.})
     }
