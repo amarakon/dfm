@@ -8,8 +8,7 @@ output: amaryaml::github
 DFM is a simple file manager that uses Dmenu.
 Instead of opening a slow graphical environment, you open Dmenu and quickly choose whatever file you want to manipulate.
 It supports multiple selections and wildcards.
-This project has reached the point to being basically flawless, so it is unlikely that I will be updating it soon.
-But please submit an issue or a pull request if you do want any changes.
+Please submit an issue or a pull request if you do want any changes.
 
 # Usage
 

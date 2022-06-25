@@ -17,8 +17,8 @@ DFM – Dmenu File Manager
 
 DFM is a simple file manager that uses Dmenu. Instead of opening a slow
 graphical environment, you open Dmenu and quickly choose whatever file
-you want to manipulate. It now supports multiselection, so you can
-manage multiple files.
+you want to manipulate. It supports multiple selections and wildcards.
+Please submit an issue or a pull request if you do want any changes.
 
 ## Usage
 
