@@ -12,6 +12,7 @@ main() {
 }
 
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
+fullcmd () { cmd ; exit 0; }
 
 prompt_base() {
     target="$2"
@@ -27,8 +28,10 @@ prompt_base() {
 	c="`echo "$sel" | cut -b1`"
 	if [ "$c" = "/" ]; then
 	    newt="$sel"
+	elif [ "$c" = "." ]; then
+	    newt="`realpath -s "$target/$sel"`"
 	else
-	    newt="`realpath -s "${target}/${sel}"`"
+	    newt="`printf "$target/$sel"`"
 	fi
 
 	if [ `ls | wc -l` -ge 1 ]; then
@@ -39,10 +42,10 @@ prompt_base() {
 		    -a `echo "$target" | grep "*" | wc -l` -ge 1 ]
 		then
 		    target=`ls -d "$PWD"/$sel`
-		    cmd ; exit 0
+		    fullcmd
 		else
 		    target=`printf "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
-		    cmd ; exit 0
+		    fullcmd
 		fi
 	    else
 		PWD="$target"
@@ -53,7 +56,7 @@ prompt_base() {
 }
 
 prompt_raw() {
-    cmd () { quotes | xargs ls; }
+    cmd () { quotes | xargs ls -d; }
     prompt_base "$@"
 }
 
