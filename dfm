@@ -15,9 +15,10 @@ quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 fullcmd () { cmd ; exit 0; }
 
 prompt_base() {
-    { [ -n "$no_key" ] && [ $# -ne 0 ] && target="`realpath -s "$1"`" && p="$2"; } ||
-    { [ $# -gt 1 ] && target="`realpath -s "$2"`" && p="$3"; } ||
-    { target="$PWD"; }
+    { [ -n "$no_key" ] && [ $# -ne 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
+    { [ $# -gt 1 ] && PWD="`realpath -s "$2"`" && p="$3"; }
+
+    target="$PWD"
 
     while true; do
 	prompt="$p"
