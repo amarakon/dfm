@@ -8,18 +8,19 @@ main() {
     { [ -n "$copy" ] && prompt_copy "$@"; } ||
     { [ -n "$copy_contents" ] && prompt_copy_contents "$@"; } ||
     { [ -n "$program" ] && prompt_program "$@"; } ||
-    { prompt_program "$@"; } 
+    { no_key=1 && prompt_program "$@"; } 
 }
 
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 fullcmd () { cmd ; exit 0; }
 
 prompt_base() {
-    target="$2"
-    [ -z "$target" ] && target="$PWD"
+    { [ -n "$no_key" ] && [ $# -ne 0 ] && target="`realpath -s "$1"`" && p="$2"; } ||
+    { [ $# -gt 1 ] && target="`realpath -s "$2"`" && p="$3"; } ||
+    { target="$PWD"; }
 
     while true; do
-	prompt="$3"
+	prompt="$p"
 	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@/home/'"$USER"'@~@'`"
 	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | dmenu -p "$prompt" -i -l 10)"
 	ec=$?
@@ -64,7 +65,7 @@ prompt_copy() {
     cmd() {
 	quotes | tr '\n' ' ' | xclip -r -i -selection clipboard
     }
-    prompt_base
+    prompt_base "$@"
 }
 
 prompt_copy_contents() {
@@ -76,7 +77,7 @@ prompt_copy_contents() {
 	fi
 	quotes | xargs $program
     }   
-    prompt_base
+    prompt_base "$@"
 }
 
 prompt_program() {
@@ -85,7 +86,7 @@ prompt_program() {
 	| xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache\
 	| cut -d '/' -f 1)/${target##*.})
     }
-    prompt_base
+    prompt_base "$@"
 }
 
 help() {
