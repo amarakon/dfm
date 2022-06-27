@@ -100,7 +100,8 @@ Options:
  -p|--program       │ Open the appropriate program for the selection
  -h|--help          │ Print this help message and exit
 
-When no arguments are supplied, the target and prompt will be the working directory, and the program option will be used."
+When no arguments are supplied, the target and prompt will be the working directory, and the program option will be used.
+"
 }
 
 parse_opts() {
