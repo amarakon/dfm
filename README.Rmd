@@ -3,7 +3,7 @@ title: DFM – Dmenu File Manager
 output: amaryaml::github
 ---
 
-![](preview.png)
+![](preview.gif)
 
 DFM is a simple file manager that uses Dmenu.
 Instead of opening a slow graphical environment, you open Dmenu and quickly choose whatever file you want to manipulate.
