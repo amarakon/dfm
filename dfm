@@ -105,32 +105,30 @@ When no arguments are supplied, the target and prompt will be the working direct
 
 parse_opts() {
     while [ $# -gt 0 ]; do
-        key="$1"
-        
-	case $key in
-	-h|--help)
-	    help=1
-	    shift
-	    ;;
-	-r|--raw)
-	    raw=1
-	    shift
-	    ;;
-	-c|--copy)
-	    copy=1
-	    shift
-	    ;;
-	-cc|--copy-contents)
-	    copy_contents=1
-	    shift
-	    ;;
-	-p|--program)
-	    program=1
-	    shift
-	    ;;
-	*)
-	    shift
-	    ;;
+	case "$1" in
+	    -h|--help)
+		help=1
+		shift
+		;;
+	    -r|--raw)
+		raw=1
+		shift
+		;;
+	    -c|--copy)
+		copy=1
+		shift
+		;;
+	    -cc|--copy-contents)
+		copy_contents=1
+		shift
+		;;
+	    -p|--program)
+		program=1
+		shift
+		;;
+	    *)
+		shift
+		;;
 	esac
 
     done
