@@ -12,7 +12,7 @@ main() {
 }
 
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
-fullcmd () { cmd ; exit 0; }
+check() { file -E "$@" | grep "(No such file or directory)$"; }
 
 prompt_base() {
     { [ -n "$no_key" ] && [ $# -ne 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
@@ -30,7 +30,7 @@ prompt_base() {
 	c="`echo "$sel" | cut -b1`"
 	if [ "$c" = "/" ]; then
 	    newt="$sel"
-	elif [ "$c" = "." ]; then
+	elif [ "$c" = "." -o "$c" ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else
 	    newt="`printf "$target/$sel"`"
@@ -39,15 +39,14 @@ prompt_base() {
 	if [ `ls | wc -l` -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ "`file -b "$target"\
-		    | rev | awk '{print $1,$2,$3,$4,$5}' | rev`" = "(No such file or directory)"\
-		    -a `echo "$target" | grep "*" | wc -l` -ge 1 ]
-		then
+		if [ `check "$target" | wc -l` -eq 1 -a `echo "$target" | grep "*" | wc -l` -ge 1 ]; then
 		    target=`ls -d "$PWD"/$sel`
-		    fullcmd
+		    cmd ; exit 0
+		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
+		    target="$PWD"
 		else
 		    target=`printf "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
-		    fullcmd
+		    cmd ; exit 0
 		fi
 	    else
 		PWD="$target"
