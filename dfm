@@ -90,7 +90,7 @@ prompt_program() {
 }
 
 help() {
-    echo "Usage:	dbrowse [options] [target] [prompt]
+    printf "Usage:	dbrowse [options] [target] [prompt]
 
 Options:
  -r|--raw           │ Print the raw output of the selection
