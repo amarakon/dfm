@@ -30,7 +30,7 @@ prompt_base() {
 	c="`echo "$sel" | cut -b1`"
 	if [ "$c" = "/" ]; then
 	    newt="$sel"
-	elif [ "$c" = "." -o "$c" ]; then
+	elif [ "$c" = "." ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else
 	    newt="`printf "$target/$sel"`"
