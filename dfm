@@ -22,7 +22,7 @@ prompt_base() {
 
     while true; do
 	prompt="$p"
-	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@/home/'"$USER"'@~@'`"
+	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"
 	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | dmenu -p "$prompt" -i -l 10)"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
@@ -30,6 +30,8 @@ prompt_base() {
 	c="`echo "$sel" | cut -b1`"
 	if [ "$c" = "/" ]; then
 	    newt="$sel"
+	elif [ "$c" = "~" ]; then
+	    newt="`printf "$sel" | sed 's@^~@/home/'"$USER"'@'`"
 	elif [ "$c" = "." ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else
