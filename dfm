@@ -11,8 +11,9 @@ main() {
     { no_key=1 && prompt_program "$@"; } 
 }
 
-quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
+tilde() { printf "$sel" | sed 's@^~@/home/'"$USER"'@'; }
 check() { file -E "$@" | grep "(No such file or directory)$"; }
+quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
     { [ -n "$no_key" ] && [ $# -ne 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
@@ -28,10 +29,12 @@ prompt_base() {
 	[ "$ec" -ne 0 ] && exit $ec
 
 	c="`echo "$sel" | cut -b1`"
-	if [ "$c" = "/" ]; then
+	if [ `echo "$sel" | grep -v "*" | wc -l` -eq 1 -a ! -e "`tilde`" -a ! -e "$target/$sel" ]; then
+	    newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"
+	elif [ "$c" = "/" ]; then
 	    newt="$sel"
 	elif [ "$c" = "~" ]; then
-	    newt="`printf "$sel" | sed 's@^~@/home/'"$USER"'@'`"
+	    newt="`tilde`"
 	elif [ "$c" = "." ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else

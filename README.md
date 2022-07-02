@@ -5,6 +5,7 @@ DFM – Dmenu File Manager
 
 -   [Introduction](#introduction)
 -   [Usage](#usage)
+    -   [Backtrack](#backtrack)
 -   [Dependencies](#dependencies)
 -   [Installation](#installation)
     -   [Universal](#universal)
@@ -44,6 +45,15 @@ press `Return` when you are finished. (This requires the
 Dmenu patch.) To select all the files, type `*`. To go to the home
 directory, type `~`. To go back a directory, type `..`. To go to the `/`
 directory, type `/`.
+
+### Backtrack
+
+A cool new feature I added is to quickly backtrack to any directory.
+This allows you to type a directory you passed in the prompt to return
+to it instead of constantly doing `..`. If you are in the
+`~/.local/src/amarakon/dfm` directory, you can type `.local` in the
+prompt and press `Return` to quickly backtrack to the `~/.local`
+directory.
 
 ## Dependencies
 
