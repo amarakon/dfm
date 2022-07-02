@@ -18,7 +18,9 @@ DFM – Dmenu File Manager
 DFM is a simple file manager that uses Dmenu. Instead of opening a slow
 graphical environment, you open Dmenu and quickly choose whatever file
 you want to manipulate. It supports multiple selections and wildcards.
-Please submit an issue or a pull request if you do want any changes.
+DFM is the fastest file manager because it is only usable with the
+keyboard. Please submit an issue or a pull request if you do want any
+changes.
 
 ## Usage
 
@@ -30,6 +32,13 @@ Please submit an issue or a pull request if you do want any changes.
 ```
 
 The default is the `program` option.
+
+To select one file, press the `Return` key. To use the input instead of
+the selection, press `Shift+Return` (not necessary most of the time). To
+select multiple files, press `Control+Return` on each selection and
+press `Return` when you are finished. To select all the files, type `*`.
+To go to the home directory, type `~`. To go back a directory, type
+`..`. To go to the `/` directory, type `/`.
 
 ## Dependencies
 
