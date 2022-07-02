@@ -3,6 +3,7 @@ DFM – Dmenu File Manager
 
 ## Contents
 
+-   [Introduction](#introduction)
 -   [Usage](#usage)
 -   [Dependencies](#dependencies)
 -   [Installation](#installation)
@@ -12,6 +13,8 @@ DFM – Dmenu File Manager
     -   [Universal](#universal-1)
     -   [Gentoo](#gentoo-1)
 -   [Credit](#credit)
+
+## Introduction
 
 ![](preview.gif)
 
