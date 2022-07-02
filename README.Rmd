@@ -36,7 +36,11 @@ To go to the `/` directory, type `/`.
 
 A cool new feature I added is to quickly backtrack to any directory.
 This allows you to type a directory you passed in the prompt to return to it instead of constantly doing `..`.
-If you are in the `~/.local/src/amarakon/dfm` directory, you can type `.local` in the prompt and press `Return` to quickly backtrack to the `~/.local` directory.
+If you are in the `/home/amarakon/.local/src/amarakon/dfm` directory, you can type `.local` in the prompt and press `Return` to quickly backtrack to the `/home/amarakon/.local` directory.
+You do not even need to type the full name!
+You can type `.l` instead of `.local` for example.
+If there is more than one match, it will use the closest one.
+For example, if I was in the `/home/amarakon/.local/src/amarakon/dfm` directory and I chose to return to `amarakon`, It will return me to `/home/amarakon/.local/src/amarakon`.
 
 # Dependencies
 
