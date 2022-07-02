@@ -35,7 +35,7 @@ prompt_base() {
 	    newt="$sel"
 	elif [ "$c" = "~" ]; then
 	    newt="`tilde`"
-	elif [ "$c" = "." ]; then
+	elif [ "$c" = "." -o `echo "$sel" | wc -l` -eq 1 ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else
 	    newt="`printf "$target/$sel"`"
