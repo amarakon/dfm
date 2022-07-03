@@ -1,4 +1,4 @@
-DFM – Dmenu File Manager
+DFM – dmenu File Manager
 ================
 
 ## Contents
@@ -19,8 +19,8 @@ DFM – Dmenu File Manager
 
 ![](preview.gif)
 
-DFM is a simple file manager that uses Dmenu. Instead of opening a slow
-graphical environment, you open Dmenu and quickly choose whatever file
+DFM is a simple file manager that uses dmenu. Instead of opening a slow
+graphical environment, you open dmenu and quickly choose whatever file
 you want to manipulate. It supports multiple selections and wildcards.
 DFM is the fastest file manager because it is only usable with the
 keyboard. Please submit an issue or a pull request if you do want any
@@ -42,7 +42,7 @@ the selection, press `Shift+Return` (not necessary most of the time). To
 select multiple files, press `Control+Return` on each selection and
 press `Return` when you are finished. (This requires the
 [multi-selection](https://tools.suckless.org/dmenu/patches/multi-selection/)
-Dmenu patch.) To select all the files, type `*`. To go to the home
+dmenu patch.) To select all the files, type `*`. To go to the home
 directory, type `~`. To go back a directory, type `..`. To go to the `/`
 directory, type `/`.
 
@@ -68,7 +68,7 @@ return to `amarakon`, It will return me to
 3.  xclip (if you want to use the *copy* or *copy contents* features.)
 
 Most of these will probably already be installed on your system, with
-the exception of Dmenu.
+the exception of dmenu.
 
 ## Installation
 
