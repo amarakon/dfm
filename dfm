@@ -87,9 +87,13 @@ prompt_copy_contents() {
 
 prompt_program() {
     cmd() {
-	quotes\
-	| xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache\
-	| cut -d '/' -f 1)/${target##*.})
+	quotes |\
+	if [ -x "`command -v sesame`" ]; then
+	    xargs sesame
+	else
+	    xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache |\
+	    cut -d '/' -f 1)/${target##*.})
+	fi
     }
     prompt_base "$@"
 }
