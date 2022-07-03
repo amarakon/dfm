@@ -3,7 +3,23 @@
 main() {
     parse_opts "$@"
     
-    { [ -n "$help" ] && help; } ||
+    if [ -n "$help" ]; then
+	help ; exit 0
+    fi
+
+    sensitive() {
+	menu="dmenu"
+	newt() { newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
+    }
+    insensitive() {
+	menu="dmenu -i"
+	newt() { newt="`printf "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
+    }
+
+    { [ -n "$sensitive" ] && sensitive; } ||
+    { [ -n "$insensitive" ] && insensitive; } ||
+    { no_sensitive=1 && insensitive; }
+
     { [ -n "$raw" ] && prompt_raw "$@"; } ||
     { [ -n "$copy" ] && prompt_copy "$@"; } ||
     { [ -n "$copy_contents" ] && prompt_copy_contents "$@"; } ||
@@ -16,21 +32,22 @@ check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
-    { [ -n "$no_key" ] && [ $# -ne 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
-    { [ $# -gt 1 ] && PWD="`realpath -s "$2"`" && p="$3"; }
+    { [ -n "$no_sensitive" -a -n "$no_key" ] && [ $# -gt 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
+    { [ -n "$no_sensitive" -o -n "$no_key" ] && [ $# -gt 1 ] && PWD="`realpath -s "$2"`" && p="$3"; } ||
+    { [ $# -gt 2 ] && PWD="`realpath -s "$3"`" && p="$4"; }
 
     target="$PWD"
 
     while true; do
 	prompt="$p"
 	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"
-	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | dmenu -p "$prompt" -i -l 10)"
+	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt" -l 10)"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
 	c="`echo "$sel" | cut -b1`"
 	if [ `echo "$sel" | grep -v "*" | wc -l` -eq 1 -a ! -e "`tilde`" -a ! -e "$target/$sel" ]; then
-	    newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"
+	    newt
 	elif [ "$c" = "/" ]; then
 	    newt="$sel"
 	elif [ "$c" = "~" ]; then
@@ -102,13 +119,15 @@ help() {
     printf "Usage:	dbrowse [options] [target] [prompt]
 
 Options:
+ -s|--sensitive     │ Use case-sensitive matching
+ -i|--insensitive   │ Use case-insensitive matching
  -r|--raw           │ Print the raw output of the selection
  -c|--copy          │ Copy the raw output of the selection
 -cc|--copy-contents │ Copy the contents of the selection
  -p|--program       │ Open the appropriate program for the selection
  -h|--help          │ Print this help message and exit
 
-When no arguments are supplied, the target and prompt will be the working directory, and the program option will be used.
+When no arguments are supplied, the target and prompt will be the working directory, and the insensitive and program options will be used.
 "
 }
 
@@ -133,6 +152,14 @@ parse_opts() {
 		;;
 	    -p|--program)
 		program=1
+		shift
+		;;
+	    -s|--sensitive)
+		sensitive=1
+		shift
+		;;
+	    -i|--insensitive)
+		insensitive=1
 		shift
 		;;
 	    *)
