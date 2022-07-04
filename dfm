@@ -122,15 +122,15 @@ Options:
  -r|--raw           │ Print the raw output of the selection
  -c|--copy          │ Copy the raw output of the selection
 -cc|--copy-contents │ Copy the contents of the selection
- -p|--program       │ Open the appropriate program for the selection
+ -p|--program       │ Open the appropriate program for the selection (default)
                     │
  -s|--sensitive     │ Use case-sensitive matching
- -i|--insensitive   │ Use case-insensitive matching
- -l|--length        │ Specify the length of dmenu
+ -i|--insensitive   │ Use case-insensitive matching (default)
+ -l|--length        │ Specify the length of dmenu (default: 10)
                     │
  -h|--help          │ Print this help message and exit
 
-By default, the target and prompt will be the working directory, and the insensitive and program options will be used.
+By default, the target and prompt will be the working directory.
 "
 }
 
