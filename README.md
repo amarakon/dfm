@@ -13,6 +13,7 @@ DFM – dmenu File Manager
 -   [Uninstallation](#uninstallation)
     -   [Universal](#universal-1)
     -   [Gentoo](#gentoo-1)
+-   [Configuration](#configuration)
 -   [Credit](#credit)
 
 ## Introduction
@@ -105,6 +106,18 @@ the exception of dmenu.
 # Remove my overlay (optional)
 `# root` eselect-repository remove -f amarlay
 `# root` emerge --sync
+```
+
+## Configuration
+
+You can change the default options for DFM via the configuration file.
+The configuration file is located in the configuration directory, so
+usually `~/.config/dfm/dfm.conf`. Here is an example configuration:
+
+``` sh
+default_mode=copy-contents
+case_sensitivity=sensitive
+length=30
 ```
 
 ## Credit

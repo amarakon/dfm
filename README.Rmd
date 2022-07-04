@@ -87,6 +87,18 @@ Most of these will probably already be installed on your system, with the except
 `# root` emerge --sync
 ```
 
+# Configuration
+
+You can change the default options for DFM via the configuration file.
+The configuration file is located in the configuration directory, so usually `~/.config/dfm/dfm.conf`.
+Here is an example configuration:
+
+```sh
+default_mode=copy-contents
+case_sensitivity=sensitive
+length=30
+```
+
 # Credit
 
 This project is based on [clamiax/scripts](https://github.com/clamiax/scripts).
