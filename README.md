@@ -118,6 +118,7 @@ usually `~/.config/dfm/dfm.conf`. Here is an example configuration:
 default_mode=copy-contents
 case_sensitivity=sensitive
 length=30
+path=full
 ```
 
 ## Credit
