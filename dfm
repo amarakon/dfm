@@ -7,24 +7,28 @@ main() {
 	help ; exit 0
     fi
 
-    sensitive() {
-	menu="dmenu"
-	newt() { newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
-    }
-    insensitive() {
-	menu="dmenu -i"
-	newt() { newt="`printf "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
-    }
+    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
+    : "${config_file:=$config_dir/dfm.conf}"
+    [ -f "$config_file" ] && . "$config_file"
 
-    { [ -n "$sensitive" ] && sensitive; } ||
-    { [ -n "$insensitive" ] && insensitive; } ||
-    { no_sensitive=1 && insensitive; }
+    [ -n "$length_option" ] && length=$length_arguments
+    [ -z  $length ] && length=10
+
+    if [ "$case_sensitivity" = "sensitive" ]; then
+	menu="dmenu -l $length"
+	newt() { newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
+    else
+	menu="dmenu -i -l $length"
+	newt() { newt="`printf "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
+    fi
+
+    [ -z $default_mode ] && default_mode=program
+    default_mode=`printf $default_mode | tr - _`
 
     { [ -n "$raw" ] && prompt_raw "$@"; } ||
     { [ -n "$copy" ] && prompt_copy "$@"; } ||
     { [ -n "$copy_contents" ] && prompt_copy_contents "$@"; } ||
-    { [ -n "$program" ] && prompt_program "$@"; } ||
-    { no_key=1 && prompt_program "$@"; } 
+    { prompt_$default_mode "$@"; } 
 }
 
 tilde() { printf "$sel" | sed 's@^~@/home/'"$USER"'@'; }
@@ -32,16 +36,12 @@ check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
-    { [ -n "$no_sensitive" -a -n "$no_key" ] && [ $# -gt 0 ] && PWD="`realpath -s "$1"`" && p="$2"; } ||
-    { [ -n "$no_sensitive" -o -n "$no_key" ] && [ $# -gt 1 ] && PWD="`realpath -s "$2"`" && p="$3"; } ||
-    { [ $# -gt 2 ] && PWD="`realpath -s "$3"`" && p="$4"; }
-
     target="$PWD"
 
     while true; do
 	prompt="$p"
 	[ -z "$prompt" ] && prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"
-	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt" -l 10)"
+	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt")"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
@@ -119,15 +119,18 @@ help() {
     printf "Usage:	dbrowse [options] [target] [prompt]
 
 Options:
- -s|--sensitive     │ Use case-sensitive matching
- -i|--insensitive   │ Use case-insensitive matching
  -r|--raw           │ Print the raw output of the selection
  -c|--copy          │ Copy the raw output of the selection
 -cc|--copy-contents │ Copy the contents of the selection
  -p|--program       │ Open the appropriate program for the selection
+                    │
+ -s|--sensitive     │ Use case-sensitive matching
+ -i|--insensitive   │ Use case-insensitive matching
+ -l|--length        │ Specify the length of dmenu
+                    │
  -h|--help          │ Print this help message and exit
 
-When no arguments are supplied, the target and prompt will be the working directory, and the insensitive and program options will be used.
+By default, the target and prompt will be the working directory, and the insensitive and program options will be used.
 "
 }
 
@@ -155,15 +158,22 @@ parse_opts() {
 		shift
 		;;
 	    -s|--sensitive)
-		sensitive=1
+		case_sensitivity="sensitive"
 		shift
 		;;
 	    -i|--insensitive)
-		insensitive=1
+		case_sensitivity="insensitive"
 		shift
 		;;
-	    *)
+	    -l|--length)
+		length_option=1
 		shift
+		length_arguments=$1
+		;;
+	    *)
+		[ -d "$1" ] && PWD="`realpath -s "$1"`"
+		shift
+		[ $# -gt 0 ] && p="$1"
 		;;
 	esac
 
