@@ -125,19 +125,19 @@ help() {
     printf "Usage:	dbrowse [options] [target] [prompt]
 
 Options:
- -r|--raw              │ Print the raw output of the selection
- -c|--copy             │ Copy the raw output of the selection
--cc|--copy-contents    │ Copy the contents of the selection
- -p|--program          │ Open the appropriate program for the selection (default)
-                       │
- -s|--sensitive        │ Use case-sensitive matching
- -i|--insensitive      │ Use case-insensitive matching (default)
- -l|--length           │ Specify the length of dmenu (default: 10)
-                       │
--fp|--full-path        │ Use the full path for the prompt
--ab|--abbreviated-path │ Use the abbreviated path for the prompt (default)
-                       │
- -h|--help             │ Print this help message and exit
+ -r|--raw           │ Print the raw output of the selection
+ -c|--copy          │ Copy the raw output of the selection
+-cc|--copy-contents │ Copy the contents of the selection
+ -p|--program       │ Open the appropriate program for the selection (default)
+                    │
+ -s|--sensitive     │ Use case-sensitive matching
+ -i|--insensitive   │ Use case-insensitive matching (default)
+ -l|--length        │ Specify the length of dmenu (default: 10)
+                    │
+ -f|--full          │ Use the full path for the prompt
+ -a|--abbreviated   │ Use the abbreviated path for the prompt (default)
+                    │
+ -h|--help          │ Print this help message and exit
 
 By default, the target and prompt will be the working directory.
 "
@@ -179,11 +179,11 @@ parse_opts() {
 		shift
 		length_arguments=$1
 		;;
-	    -fp|--full-path)
+	    -f|--full)
 		path="full"
 		shift
 		;;
-	    -ap|--abbreviated-path)
+	    -a|--abbreviated)
 		path="abbreviated"
 		shift
 		;;
