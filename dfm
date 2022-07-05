@@ -31,7 +31,7 @@ main() {
     [ -z $default_mode ] && default_mode=open
     default_mode=`printf $default_mode | tr - _`
 
-    { [ -n "$raw" ] && prompt_raw "$@"; } ||
+    { [ -n "$print" ] && prompt_print "$@"; } ||
     { [ -n "$copy" ] && prompt_copy "$@"; } ||
     { [ -n "$copy_contents" ] && prompt_copy_contents "$@"; } ||
     { prompt_$default_mode "$@"; } 
@@ -90,7 +90,7 @@ prompt_base() {
     done
 }
 
-prompt_raw() {
+prompt_print() {
     cmd () { quotes | xargs ls -d; }
     prompt_base "$@"
 }
@@ -131,8 +131,8 @@ help() {
     printf "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
- -r|--raw           │ Print the raw output of the selection
- -c|--copy          │ Copy the raw output of the selection
+ -p|--print         │ Print the output of the selection
+ -c|--copy          │ Copy the output of the selection
     --copy-contents │ Copy the contents of the selection
  -o|--open          │ Open the appropriate program for the selection (default)
                     │
@@ -153,7 +153,7 @@ parse_opts() {
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
-    while getopts hrcosil:fa-: OPT; do
+    while getopts hpcosil:fa-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
 	if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
 	    OPT="${OPTARG%%=*}"       # extract long option name
@@ -162,7 +162,7 @@ parse_opts() {
 	fi
 	case "$OPT" in
 	    h | help)     	help=1 ;;
-	    r | raw)      	raw=1 ;;
+	    p | print)      	print=1 ;;
 	    c | copy)     	copy=1 ;;
 	    copy-contents)	copy_contents=1 ;;
 	    o | open)		open=1 ;;
