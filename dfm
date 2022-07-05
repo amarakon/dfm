@@ -151,7 +151,7 @@ By default, the target and prompt will be the working directory.
 
 parse_opts() {
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
-    needs_arg() { [ -z "$OPTARG" ] && die "No argument for --$OPT option"; }
+    needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
     while getopts hrcosil:fa-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
