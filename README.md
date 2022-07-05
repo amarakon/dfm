@@ -33,10 +33,10 @@ changes.
 `# user` dfm --raw # Print the raw output of the selection
 `# user` dfm --copy # Copy the raw output of the selection
 `# user` dfm --copy-contents # Copy the contents of the selection
-`# user` dfm --program # Open the appropriate program for the selection
+`# user` dfm --open # Open the appropriate program for the selection
 ```
 
-The default is the `program` option.
+The default is the `open` option.
 
 To select one file, press the `Return` key. To use the input instead of
 the selection, press `Shift+Return` (not necessary most of the time). To

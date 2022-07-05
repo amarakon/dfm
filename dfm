@@ -42,6 +42,12 @@ check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
+    eval last=\${$#}
+    eval second_last=\${$(($#-1))}
+
+    { [ $# -gt 0 ] && [ -d "$last" ] && PWD="`realpath -s "$last"`"; } ||
+    { [ $# -gt 1 ] && [ -d "$second_last" ] && PWD="`realpath -s "$second_last"`" && p="$last"; }
+
     target="$PWD"
 
     while true; do
@@ -127,8 +133,8 @@ help() {
 Options:
  -r|--raw           │ Print the raw output of the selection
  -c|--copy          │ Copy the raw output of the selection
--cc|--copy-contents │ Copy the contents of the selection
- -p|--program       │ Open the appropriate program for the selection (default)
+    --copy-contents │ Copy the contents of the selection
+ -o|--open          │ Open the appropriate program for the selection (default)
                     │
  -s|--sensitive     │ Use case-sensitive matching
  -i|--insensitive   │ Use case-insensitive matching (default)
@@ -144,57 +150,32 @@ By default, the target and prompt will be the working directory.
 }
 
 parse_opts() {
-    while [ $# -gt 0 ]; do
-	case "$1" in
-	    -h|--help)
-		help=1
-		shift
-		;;
-	    -r|--raw)
-		raw=1
-		shift
-		;;
-	    -c|--copy)
-		copy=1
-		shift
-		;;
-	    -cc|--copy-contents)
-		copy_contents=1
-		shift
-		;;
-	    -p|--program)
-		program=1
-		shift
-		;;
-	    -s|--sensitive)
-		case_sensitivity="sensitive"
-		shift
-		;;
-	    -i|--insensitive)
-		case_sensitivity="insensitive"
-		shift
-		;;
-	    -l|--length)
-		length_option=1
-		shift
-		length_arguments=$1
-		;;
-	    -f|--full)
-		path="full"
-		shift
-		;;
-	    -a|--abbreviated)
-		path="abbreviated"
-		shift
-		;;
-	    *)
-		[ -d "$1" ] && PWD="`realpath -s "$1"`"
-		shift
-		[ $# -gt 0 ] && p="$1"
-		;;
-	esac
+    die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
+    needs_arg() { [ -z "$OPTARG" ] && die "No argument for --$OPT option"; }
 
+    while getopts hrcosil:fa-: OPT; do
+	# support long options: https://stackoverflow.com/a/28466267/519360
+	if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
+	    OPT="${OPTARG%%=*}"       # extract long option name
+	    OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
+	    OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+	fi
+	case "$OPT" in
+	    h | help)     	help=1 ;;
+	    r | raw)      	raw=1 ;;
+	    c | copy)     	copy=1 ;;
+	    copy-contents)	copy_contents=1 ;;
+	    o | open)		program=1 ;;
+	    s | sensitive)	case_sensitivity="sensitive" ;;
+	    i | insensitive)	case_sensitivity="insensitive" ;;
+	    l | length)		needs_arg ; length_option=1 length_arguments=$OPTARG ;;
+	    f | full)		path="full" ;;
+	    a | abbreviated)	path="abbreviated" ;;
+	    ??*)          	die "Illegal option --$OPT" ;;  # bad long option
+	    ?)            	exit 2 ;;  # bad short option (error reported via getopts)
+	esac
     done
+    shift $((OPTIND-1)) # remove parsed options and args from $@ list
 }
 
 main "$@"
