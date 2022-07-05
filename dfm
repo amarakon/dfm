@@ -28,7 +28,7 @@ main() {
 	prompt() { prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
     fi
 
-    [ -z $default_mode ] && default_mode=program
+    [ -z $default_mode ] && default_mode=open
     default_mode=`printf $default_mode | tr - _`
 
     { [ -n "$raw" ] && prompt_raw "$@"; } ||
@@ -114,7 +114,7 @@ prompt_copy_contents() {
     prompt_base "$@"
 }
 
-prompt_program() {
+prompt_open() {
     cmd() {
 	quotes |\
 	if [ -x "`command -v sesame`" ]; then
@@ -165,7 +165,7 @@ parse_opts() {
 	    r | raw)      	raw=1 ;;
 	    c | copy)     	copy=1 ;;
 	    copy-contents)	copy_contents=1 ;;
-	    o | open)		program=1 ;;
+	    o | open)		open=1 ;;
 	    s | sensitive)	case_sensitivity="sensitive" ;;
 	    i | insensitive)	case_sensitivity="insensitive" ;;
 	    l | length)		needs_arg ; length_option=1 length_arguments=$OPTARG ;;
