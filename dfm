@@ -122,7 +122,7 @@ prompt_program() {
 }
 
 help() {
-    printf "Usage:	dbrowse [options] [target] [prompt]
+    printf "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
  -r|--raw           │ Print the raw output of the selection
