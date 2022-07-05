@@ -47,11 +47,11 @@ prompt_base() {
     while true; do
 	prompt="$p"
 	[ -z "$prompt" ] && prompt
-	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt")"
+	sel="$(printf "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt")"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
-	c="`echo "$sel" | cut -b1`"
+	c="`printf "$sel" | cut -b1`"
 	if [ `echo "$sel" | grep -v "*" | wc -l` -eq 1 -a ! -e "`tilde`" -a ! -e "$target/$sel" ]; then
 	    newt
 	elif [ "$c" = "/" ]; then
