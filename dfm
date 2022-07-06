@@ -28,13 +28,14 @@ main() {
 	prompt() { prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
     fi
 
-    [ -z $default_mode ] && default_mode=open
-    default_mode=`printf $default_mode | tr - _`
+    [ -z $mode ] && mode=open
 
+    { [ -n "$copy" -o $mode = copy ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
+    { [ -n "$open" ] && prompt_open "$@"; } ||
+    { [ -n "$cat" ] && prompt_print_contents "$@"; } ||
     { [ -n "$print" ] && prompt_print "$@"; } ||
     { [ -n "$copy" ] && prompt_copy "$@"; } ||
-    { [ -n "$copy_contents" ] && prompt_copy_contents "$@"; } ||
-    { prompt_$default_mode "$@"; } 
+    { prompt_$mode "$@"; } 
 }
 
 tilde() { printf "$sel" | sed 's@^~@/home/'"$USER"'@'; }
@@ -95,6 +96,11 @@ prompt_print() {
     prompt_base "$@"
 }
 
+prompt_print_contents() {
+    cmd() { quotes | xargs cat; }
+    prompt_base "$@"
+}
+
 prompt_copy() {
     cmd() {
 	quotes | tr '\n' ' ' | xclip -r -i -selection clipboard
@@ -131,19 +137,21 @@ help() {
     printf "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
- -p|--print         │ Print the output of the selection
- -c|--copy          │ Copy the output of the selection
-    --copy-contents │ Copy the contents of the selection
- -o|--open          │ Open the appropriate program for the selection (default)
-                    │
- -s|--sensitive     │ Use case-sensitive matching
- -i|--insensitive   │ Use case-insensitive matching (default)
- -l|--length        │ Specify the length of dmenu (default: 10)
-                    │
- -f|--full          │ Use the full path for the prompt
- -a|--abbreviated   │ Use the abbreviated path for the prompt (default)
-                    │
- -h|--help          │ Print this help message and exit
+  Modes:             │
+  -p|--print         │ Print the output of the selection
+  -c|--copy          │ Copy the output of the selection
+  -o|--open          │ Open the appropriate program for the selection (default)
+                     │
+    --cat            │ Concatenate the selections before using a mode
+                     │
+ -s|--sensitive      │ Use case-sensitive matching
+ -i|--insensitive    │ Use case-insensitive matching (default)
+ -l|--length         │ Specify the length of dmenu (default: 10)
+                     │
+ -f|--full           │ Use the full path for the prompt
+ -a|--abbreviated    │ Use the abbreviated path for the prompt (default)
+                     │
+ -h|--help           │ Print this help message and exit
 
 By default, the target and prompt will be the working directory.
 "
@@ -164,7 +172,7 @@ parse_opts() {
 	    h | help)     	help=1 ;;
 	    p | print)      	print=1 ;;
 	    c | copy)     	copy=1 ;;
-	    copy-contents)	copy_contents=1 ;;
+	    cat)		cat=1 ;;
 	    o | open)		open=1 ;;
 	    s | sensitive)	case_sensitivity="sensitive" ;;
 	    i | insensitive)	case_sensitivity="insensitive" ;;

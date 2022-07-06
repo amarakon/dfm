@@ -30,9 +30,8 @@ changes.
 ## Usage
 
 ``` sh
-`# user` dfm --raw # Print the raw output of the selection
-`# user` dfm --copy # Copy the raw output of the selection
-`# user` dfm --copy-contents # Copy the contents of the selection
+`# user` dfm --raw # Print the output of the selection
+`# user` dfm --copy # Copy the output of the selection
 `# user` dfm --open # Open the appropriate program for the selection
 ```
 
@@ -115,7 +114,8 @@ The configuration file is located in the configuration directory, so
 usually `~/.config/dfm/dfm.conf`. Here is an example configuration:
 
 ``` sh
-default_mode=copy-contents
+mode=copy
+cat=true
 case_sensitivity=sensitive
 length=30
 path=full
