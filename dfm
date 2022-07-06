@@ -43,18 +43,6 @@ check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
-    if [ -n "$1" ]; then
-	if [ ! -d "$1" ]; then
-	    echo "`basename $0`: cannot access '$1': No such directory"
-	    exit 1
-	fi
-	
-	PWD="`realpath -s "$1"`"
-    fi
-
-    target="$PWD"
-    p="$2"
-
     while true; do
 	prompt="$p"
 	[ -z "$prompt" ] && prompt
@@ -188,6 +176,18 @@ parse_opts() {
 	esac
     done
     shift $((OPTIND-1)) # remove parsed options and args from $@ list
+
+    if [ -n "$1" ]; then
+	if [ ! -d "$1" ]; then
+	    echo "`basename $0`: cannot access '$1': No such directory"
+	    exit 1
+	fi
+	
+	PWD="`realpath -s "$1"`"
+    fi
+
+    target="$PWD"
+    p="$2"
 }
 
 main "$@"
