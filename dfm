@@ -38,7 +38,7 @@ main() {
     { prompt_$mode "$@"; } 
 }
 
-tilde() { printf "$sel" | sed 's@^~@/home/'"$USER"'@'; }
+tilde() { printf "$sel" | sed 's|^~|/home/'"$USER"'|' | xargs -I '{}' realpath -s {}; }
 check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
