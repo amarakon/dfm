@@ -1,15 +1,15 @@
 #!/bin/sh
 
 main() {
+    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
+    : "${config_file:=$config_dir/dfm.conf}"
+    [ -f "$config_file" ] && . "$config_file"
+
     parse_opts "$@"
     
     if [ -n "$help" ]; then
 	help ; exit 0
     fi
-
-    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
-    : "${config_file:=$config_dir/dfm.conf}"
-    [ -f "$config_file" ] && . "$config_file"
 
     [ -n "$length_option" ] && length=$length_arguments
     [ -z  $length ] && length=10
@@ -23,9 +23,9 @@ main() {
     fi
 
     if [ "$path" = "full" ]; then
-	prompt() { prompt="`printf "$target"`"; }
+	prompt() { p="`printf "$target"`"; }
     else
-	prompt() { prompt="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
+	prompt() { p="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
     fi
 
     [ -z $mode ] && mode=open
@@ -44,9 +44,9 @@ quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
     while true; do
-	prompt="$p"
-	[ -z "$prompt" ] && prompt
-	sel="$(printf "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$prompt")"
+	p="$prompt"
+	[ -z "$p" ] && prompt
+	sel="$(printf "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$p")"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
@@ -189,7 +189,7 @@ parse_opts() {
     fi
 
     target="$PWD"
-    p="$2"
+    [ -n "$2" ] && prompt="$2"
 }
 
 main "$@"
