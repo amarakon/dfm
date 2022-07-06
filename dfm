@@ -43,13 +43,17 @@ check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
-    [ $# -eq 1 ] && eval last=\${$#}
-    [ $# -ge 2 ] && eval second_last=\${$(($#-1))}
-
-    { [ $# -gt 0 ] && [ -d "$last" ] && PWD="`realpath -s "$last"`"; } ||
-    { [ $# -gt 1 ] && [ -d "$second_last" ] && PWD="`realpath -s "$second_last"`" && p="$last"; }
+    if [ -n "$1" ]; then
+	if [ ! -d "$1" ]; then
+	    echo "`basename $0`: cannot access '$1': No such directory"
+	    exit 1
+	fi
+	
+	PWD="`realpath -s "$1"`"
+    fi
 
     target="$PWD"
+    p="$2"
 
     while true; do
 	prompt="$p"
