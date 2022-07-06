@@ -114,7 +114,7 @@ The configuration file is located in the configuration directory, so
 usually `~/.config/dfm/dfm.conf`. Here is an example configuration:
 
 ``` sh
-mode=copy
+copy="clipboard"
 cat=true
 case_sensitivity=sensitive
 length=30
