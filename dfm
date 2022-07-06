@@ -30,11 +30,11 @@ main() {
 
     [ -z $mode ] && mode=open
 
-    { [ -n "$copy" -o $mode = copy ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
+    { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
     { [ -n "$open" ] && prompt_open "$@"; } ||
     { [ -n "$cat" ] && prompt_print_contents "$@"; } ||
     { [ -n "$print" ] && prompt_print "$@"; } ||
-    { [ -n "$copy" ] && prompt_copy "$@"; } ||
+    { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && prompt_copy "$@"; } ||
     { prompt_$mode "$@"; } 
 }
 
@@ -95,7 +95,7 @@ prompt_print_contents() {
 
 prompt_copy() {
     cmd() {
-	quotes | tr '\n' ' ' | xclip -r -i -selection clipboard
+	quotes | tr '\n' ' ' | xclip -r -i -selection $copy
     }
     prompt_base "$@"
 }
@@ -103,9 +103,9 @@ prompt_copy() {
 prompt_copy_contents() {
     cmd() {
 	if [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ]; then
-	    program="xclip -i -selection clipboard -t image/png"
+	    program="xclip -i -selection $copy -t image/png"
 	else
-	    program="xclip -r -i -selection clipboard"
+	    program="xclip -r -i -selection $copy"
 	fi
 	quotes | xargs $program
     }   
@@ -129,21 +129,22 @@ help() {
     printf "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
-  Modes:             │
-  -p|--print         │ Print the output of the selection
-  -c|--copy          │ Copy the output of the selection
-  -o|--open          │ Open the appropriate program for the selection (default)
-                     │
-    --cat            │ Concatenate the selections before using a mode
-                     │
- -s|--sensitive      │ Use case-sensitive matching
- -i|--insensitive    │ Use case-insensitive matching (default)
- -l|--length         │ Specify the length of dmenu (default: 10)
-                     │
- -f|--full           │ Use the full path for the prompt
- -a|--abbreviated    │ Use the abbreviated path for the prompt (default)
-                     │
- -h|--help           │ Print this help message and exit
+  Modes:
+  -p|--print        │ Print the output of the selection
+  -o|--open         │ Open the appropriate program for the selection (default)
+
+   --cat            │ Concatenate the selections before using a mode
+-c|--copy           │ Copy the output of the selection (\"primary\", \"secondary\", \"clipboard\" or \"buffer-cut\")
+   --no-copy        │ Do not copy (always overrides --copy)
+                    │
+-s|--sensitive      │ Use case-sensitive matching
+-i|--insensitive    │ Use case-insensitive matching (default)
+-l|--length         │ Specify the length of dmenu (default: 10)
+                    │
+-f|--full           │ Use the full path for the prompt
+-a|--abbreviated    │ Use the abbreviated path for the prompt (default)
+                    │
+-h|--help           │ Print this help message and exit
 
 By default, the target and prompt will be the working directory.
 "
@@ -153,7 +154,7 @@ parse_opts() {
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
-    while getopts hpcosil:fa-: OPT; do
+    while getopts hpc:osil:fa-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
 	if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
 	    OPT="${OPTARG%%=*}"       # extract long option name
@@ -163,7 +164,8 @@ parse_opts() {
 	case "$OPT" in
 	    h | help)     	help=1 ;;
 	    p | print)      	print=1 ;;
-	    c | copy)     	copy=1 ;;
+	    c | copy)     	needs_arg ; copy="$OPTARG" ;;
+	    no-copy)		no_copy=1 ;;
 	    cat)		cat=1 ;;
 	    o | open)		open=1 ;;
 	    s | sensitive)	case_sensitivity="sensitive" ;;

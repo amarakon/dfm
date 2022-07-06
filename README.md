@@ -30,8 +30,8 @@ changes.
 ## Usage
 
 ``` sh
-`# user` dfm --raw # Print the output of the selection
-`# user` dfm --copy # Copy the output of the selection
+`# user` dfm --print # Print the output of the selection
+`# user` dfm --copy clipboard # Copy the output of the selection to the clipboard
 `# user` dfm --open # Open the appropriate program for the selection
 ```
 
