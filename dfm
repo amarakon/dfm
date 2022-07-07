@@ -188,7 +188,7 @@ parse_opts() {
 	PWD="`realpath -s "$1"`"
     fi
 
-    target="$PWD"
+    [ -z "$target" ] && target="$PWD"
     [ -n "$2" ] && prompt="$2"
     [ ! -z "$prompt" ] && [ "`realpath -s "$prompt"`" = "$target" ] && unset prompt
 }
