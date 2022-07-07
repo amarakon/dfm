@@ -179,10 +179,12 @@ parse_opts() {
     done
     shift $((OPTIND-1)) # remove parsed options and args from $@ list
 
-    [ -n "$1" ] && PWD="`realpath -s "$1"`"
+    [ -n "$1" ] && target="$1"
     [ -z "$target" ] && target="$PWD"
 
-    if [ ! -d "$target" ]; then
+    if [ -d "$target" ]; then
+	target="`realpath -s "$target"`"
+    elif [ ! -d "$target" ]; then
 	echo "`basename $0`: cannot access '$target': No such directory"
 	exit 1
     fi
