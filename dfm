@@ -66,9 +66,14 @@ prompt_base() {
 	if [ `ls | wc -l` -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ `check "$target" | wc -l` -eq 1 -a `echo "$target" | grep "*" | wc -l` -ge 1 ]; then
-		    target=`ls -d "$PWD"/$sel`
-		    cmd ; exit 0
+		if [ `echo "$target" | grep "*" | wc -l` -ge 1 -a `check "$target" | wc -l` -eq 1 ]; then
+		    test=`ls "$PWD"/$sel 2> /dev/null`
+		    if [ $? -ne 0 ]; then
+			target="$PWD"
+		    else
+			target=`ls -d "$PWD"/$sel`
+			cmd ; exit 0
+		    fi
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
 		else
@@ -184,6 +189,7 @@ parse_opts() {
 
     if [ -d "$target" ]; then
 	target="`realpath -s "$target"`"
+	PWD="$target"
     elif [ ! -d "$target" ]; then
 	echo "`basename $0`: cannot access '$target': No such directory"
 	exit 1
