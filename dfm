@@ -16,16 +16,16 @@ main() {
 
     if [ "$case_sensitivity" = "sensitive" ]; then
 	menu="dmenu -l $length"
-	newt() { newt="`printf "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
+	newt() { newt="`echo "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
     else
 	menu="dmenu -i -l $length"
-	newt() { newt="`printf "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
+	newt() { newt="`echo "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
     fi
 
     if [ "$path" = "full" ]; then
-	prompt() { p="`printf "$target"`"; }
+	prompt() { p="`echo "$target"`"; }
     else
-	prompt() { p="`printf "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
+	prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
     fi
 
     [ -z $mode ] && mode=open
@@ -38,15 +38,15 @@ main() {
     { prompt_$mode "$@"; } 
 }
 
-tilde() { printf "$sel" | sed 's|^~|/home/'"$USER"'|' | xargs -I '{}' realpath -s {}; }
+tilde() { echo "$sel" | sed 's|^~|/home/'"$USER"'|' | xargs -I '{}' realpath -s {}; }
 check() { file -E "$@" | grep "(No such file or directory)$"; }
-quotes() { printf "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
+quotes() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
 prompt_base() {
     while true; do
 	p="$prompt"
 	[ -z "$p" ] && prompt
-	sel="$(printf "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$p")"
+	sel="$(echo "$(ls "$target"; ls -A "$target" | grep '^\.' )" | $menu -p "$p")"
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
@@ -60,7 +60,7 @@ prompt_base() {
 	elif [ "$c" = "." -o `echo "$sel" | wc -l` -eq 1 ]; then
 	    newt="`realpath -s "$target/$sel"`"
 	else
-	    newt="`printf "$target/$sel"`"
+	    newt="`echo "$target/$sel"`"
 	fi
 
 	if [ `ls | wc -l` -ge 1 ]; then
@@ -77,7 +77,7 @@ prompt_base() {
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
 		else
-		    target=`printf "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
+		    target=`echo "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
 		    cmd ; exit 0
 		fi
 	    else
