@@ -16,9 +16,11 @@ main() {
 
     if [ "$case_sensitivity" = "sensitive" ]; then
 	menu="dmenu -l $length"
+	greps="grep"
 	newt() { newt="`echo "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
     else
 	menu="dmenu -i -l $length"
+	greps="grep -i"
 	newt() { newt="`echo "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
     fi
 
@@ -38,7 +40,7 @@ main() {
     { prompt_$mode "$@"; } 
 }
 
-tilde() { echo "$sel" | sed 's|^~|/home/'"$USER"'|' | xargs -I '{}' realpath -s {}; }
+truepath() { sh -c "realpath -s "$sel""; }
 check() { file -E "$@" | grep "(No such file or directory)$"; }
 quotes() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
 
@@ -50,15 +52,16 @@ prompt_base() {
 	ec=$?
 	[ "$ec" -ne 0 ] && exit $ec
 
-	c="`printf "$sel" | cut -b1`"
-	if [ `echo "$sel" | grep -v "*" | wc -l` -eq 1 -a ! -e "`tilde`" -a ! -e "$target/$sel" ]; then
-	    newt
-	elif [ "$c" = "/" ]; then
-	    newt="$sel"
-	elif [ "$c" = "~" ]; then
-	    newt="`tilde`"
-	elif [ "$c" = "." -o `echo "$sel" | wc -l` -eq 1 ]; then
-	    newt="`realpath -s "$target/$sel"`"
+	if [ `echo "$sel" | wc -l` -eq 1 ]; then
+	    if [ ! -e "$target/$sel" -a $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
+		if [ ! -e "`truepath`" ]; then
+		    newt
+		else
+		    newt="`truepath`"
+		fi
+	    else
+		newt="`realpath -s "$target/$sel"`"
+	    fi
 	else
 	    newt="`echo "$target/$sel"`"
 	fi
