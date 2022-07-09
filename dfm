@@ -144,7 +144,7 @@ Options:
 
    --cat            │ Concatenate the selections before using a mode
 -c|--copy           │ Copy the output of the selection (\"primary\", \"secondary\", \"clipboard\" or \"buffer-cut\")
-   --no-copy        │ Do not copy (always overrides --copy)
+   --no-copy        │ Do not copy (always overrides \`--copy\`)
                     │
 -s|--sensitive      │ Use case-sensitive matching
 -i|--insensitive    │ Use case-insensitive matching (default)
