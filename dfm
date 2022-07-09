@@ -67,6 +67,7 @@ prompt_base() {
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
 		if [ `echo "$target" | grep "*" | wc -l` -ge 1 -a `check "$target" | wc -l` -eq 1 ]; then
+		    IFS=
 		    test=`ls "$PWD"/$sel 2> /dev/null`
 		    if [ $? -ne 0 ]; then
 			target="$PWD"
