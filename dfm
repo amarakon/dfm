@@ -43,16 +43,14 @@ prompt_base() {
 	[ "$ec" -ne 0 ] && exit $ec
 
 	if [ `echo "$sel" | wc -l` -eq 1 ]; then
-	    if [ ! -e "$target/$sel" -o "`realpath -s "$target/$sel"`" != "$target/$sel" ]; then
+	    if [ ! -e "$target/$sel" -a $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
 		if [ ! -e "`truepath`" ]; then
-		    if [ $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
-			newt="`echo "$target" | replace`"
-		    else
-			newt="`realpath -s "$target/$sel"`"
-		    fi
+		    newt="`echo "$target" | replace`"
 		else
 		    newt="`truepath`"
 		fi
+	    elif [ "`echo "$sel" | cut -b 1`" = "/" ]; then
+		newt="`truepath`"
 	    else
 		newt="`realpath -s "$target/$sel"`"
 	    fi
