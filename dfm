@@ -7,31 +7,21 @@ main() {
 
     parse_opts "$@"
     
-    if [ -n "$help" ]; then
-	help ; exit 0
-    fi
-
     [ -n "$length_option" ] && length=$length_arguments
     [ -z  $length ] && length=10
 
     if [ "$case_sensitivity" = "sensitive" ]; then
-	menu="dmenu -l $length"
-	greps="grep"
-	newt() { newt="`echo "$target" | sed 's|\(.*/'$sel'[^/]*\).*|\1|'`"; }
+	menu="dmenu -l $length" greps="grep"
+	replace() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; }
     else
-	menu="dmenu -i -l $length"
-	greps="grep -i"
-	newt() { newt="`echo "$target" | perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'`"; }
+	menu="dmenu -i -l $length" greps="grep -i"
+	replace() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
     fi
 
-    if [ "$path" = "full" ]; then
-	prompt() { p="`echo "$target"`"; }
-    else
-	prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }
-    fi
+    { [ "$path" = "full" ] && prompt() { p="`echo "$target"`"; }; } ||
+    { prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }; }
 
     [ -z $mode ] && mode=open
-
     { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
     { [ -n "$open" ] && prompt_open "$@"; } ||
     { [ -n "$cat" ] && prompt_print_contents "$@"; } ||
@@ -55,7 +45,7 @@ prompt_base() {
 	if [ `echo "$sel" | wc -l` -eq 1 ]; then
 	    if [ ! -e "$target/$sel" -a $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
 		if [ ! -e "`truepath`" ]; then
-		    newt
+		    newt="`echo "$target" | replace`"
 		else
 		    newt="`truepath`"
 		fi
@@ -171,7 +161,7 @@ parse_opts() {
 	    OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
 	fi
 	case "$OPT" in
-	    h | help)     	help=1 ;;
+	    h | help)     	help ; exit 0 ;;
 	    p | print)      	print=1 ;;
 	    c | copy)     	needs_arg ; copy="$OPTARG" ;;
 	    no-copy)		no_copy=1 ;;
