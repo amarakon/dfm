@@ -10,8 +10,9 @@ output: amaryaml::github
 DFM is a simple file manager that uses dmenu.
 Instead of opening a slow graphical environment, you open dmenu and quickly choose whatever file you want to manipulate.
 It supports multiple selections and wildcards.
-DFM is the fastest file manager because it is only usable with the keyboard.
-Please submit an issue or a pull request if you do want any changes.
+DFM is the fastest file manager because it is only usable with the keyboard, unless you apply the [mouse-support](https://tools.suckless.org/dmenu/patches/mouse-support/) dmenu patch.
+Keep in mind that DFM is still not a finished project, meaning you will rarely encounter a bug.
+Please submit an issue or a pull request if you have any issues or want any changes.
 
 # Usage
 
