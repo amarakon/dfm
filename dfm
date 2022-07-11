@@ -49,7 +49,7 @@ prompt_base() {
 		else
 		    newt="`truepath`"
 		fi
-	    elif [ -e "`truepath`" ]; then
+	    elif [ -e "`truepath`" ] && [ ! -e "$target/$sel" -o "`echo "$target/$sel" | rev | cut -b 1-2`" = "//" ]; then
 		newt="`truepath`"
 	    else
 		newt="`realpath -s "$target/$sel"`"
