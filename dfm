@@ -1,10 +1,6 @@
 #!/bin/sh
 
 main() {
-    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
-    : "${config_file:=$config_dir/dfm.conf}"
-    [ -f "$config_file" ] && . "$config_file"
-
     parse_opts "$@"
     
     [ -n "$length_option" ] && length=$length_arguments
@@ -152,6 +148,10 @@ By default, the target and prompt will be the working directory.
 }
 
 parse_opts() {
+    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
+    : "${config_file:=$config_dir/dfm.conf}"
+    [ -f "$config_file" ] && . "$config_file"
+
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
