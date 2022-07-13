@@ -45,7 +45,7 @@ prompt_base() {
 		newt="`realpath -s "$target/$sel"`"
 	    fi
 	else
-	    newt="`echo "$target/$sel"`"
+	    newt="$sel"
 	fi
 
 	if [ `ls | wc -l` -ge 1 ]; then
@@ -59,7 +59,7 @@ prompt_base() {
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
 		else
-		    target=`echo "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'` fullcmd
+		    target=`echo "$target" | sed 's|^|'"$PWD"/'|'` fullcmd
 		fi
 	    else
 		PWD="$target"
