@@ -13,13 +13,13 @@ main() {
 }
 
 prompt_base() {
-    [ -z  $length ] && length=10
+    [ -z $length ] && length=10
 
     if [ "$case_sensitivity" = "sensitive" ]; then
-	menu="dmenu -l $length" greps="grep"
+	menu="dmenu -l $length" grep="grep"
 	backtrack() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; }
     else
-	menu="dmenu -i -l $length" greps="grep -i"
+	menu="dmenu -i -l $length" grep="grep -i"
 	backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
     fi
 
@@ -27,6 +27,7 @@ prompt_base() {
     { prompt() { p="`echo "$target" | sed 's|^'"$HOME"'|~|'`"; }; }
 
     truepath() { sh -c "realpath -s "$sel""; }
+    slash() { echo "$target/$sel" | rev | cut -b 1-2; }
     check() { file -E "$@" | grep "(No such file or directory)$"; }
     fullcmd() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
 
@@ -36,10 +37,12 @@ prompt_base() {
 	ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 	if [ `echo "$sel" | wc -l` -eq 1 ]; then
-	    if [ ! -e "$target/$sel" -a $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
+	    if [ -e "$target/$sel" -a "`slash`" != "//" ]; then
+		newt="`realpath -s "$target/$sel"`"
+	    elif [ ! -e "$target/$sel" -a $(echo "$target" | $grep "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
 		{ [ ! -e "`truepath`" ] && newt="`echo "$target" | backtrack`"; } ||
 		{ newt="`truepath`"; }
-	    elif [ -e "`truepath`" ] && [ ! -e "$target/$sel" -o "`echo "$target/$sel" | rev | cut -b 1-2`" = "//" ]; then
+	    elif [ -e "`truepath`" ] && [ ! -e "$target/$sel" -o "`slash`" = "//" ]; then
 		newt="`truepath`"
 	    else
 		newt="`realpath -s "$target/$sel"`"
@@ -58,8 +61,10 @@ prompt_base() {
 		    { target=`ls -d "$PWD"/$sel` fullcmd; }
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
-		else
+		elif [ `echo "$target" | wc -l` -gt 1 ]; then
 		    target=`echo "$target" | sed 's|^|'"$PWD"/'|'` fullcmd
+		else
+		    fullcmd
 		fi
 	    else
 		PWD="$target"
