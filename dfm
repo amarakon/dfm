@@ -23,8 +23,8 @@ prompt_base() {
 	backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
     fi
 
-    { [ "$path" = "full" ] && prompt() { p="`echo "$target"`"; }; } ||
-    { prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }; }
+    { [ "$path" = "full" ] && prompt() { p="$target"; }; } ||
+    { prompt() { p="`echo "$target" | sed 's|^'"$HOME"'|~|'`"; }; }
 
     truepath() { sh -c "realpath -s "$sel""; }
     check() { file -E "$@" | grep "(No such file or directory)$"; }
