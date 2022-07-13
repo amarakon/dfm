@@ -3,20 +3,6 @@
 main() {
     parse_opts "$@"
     
-    [ -n "$length_option" ] && length=$length_arguments
-    [ -z  $length ] && length=10
-
-    if [ "$case_sensitivity" = "sensitive" ]; then
-	menu="dmenu -l $length" greps="grep"
-	replace() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; }
-    else
-	menu="dmenu -i -l $length" greps="grep -i"
-	replace() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
-    fi
-
-    { [ "$path" = "full" ] && prompt() { p="`echo "$target"`"; }; } ||
-    { prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }; }
-
     [ -z $mode ] && mode=open
     { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
     { [ -n "$open" ] && prompt_open "$@"; } ||
@@ -26,25 +12,33 @@ main() {
     { prompt_$mode "$@"; } 
 }
 
-truepath() { sh -c "realpath -s "$sel""; }
-check() { file -E "$@" | grep "(No such file or directory)$"; }
-quotes() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/"; }
-
 prompt_base() {
+    [ -z  $length ] && length=10
+
+    if [ "$case_sensitivity" = "sensitive" ]; then
+	menu="dmenu -l $length" greps="grep"
+	backtrack() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; }
+    else
+	menu="dmenu -i -l $length" greps="grep -i"
+	backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
+    fi
+
+    { [ "$path" = "full" ] && prompt() { p="`echo "$target"`"; }; } ||
+    { prompt() { p="`echo "$target" | sed 's@^/home/'"$USER"'@~@'`"; }; }
+
+    truepath() { sh -c "realpath -s "$sel""; }
+    check() { file -E "$@" | grep "(No such file or directory)$"; }
+    fullcmd() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
+
     while true; do
-	p="$prompt"
-	[ -z "$p" ] && prompt
+	p="$prompt" ; [ -z "$p" ] && prompt
 	sel="$(echo "$(ls --group-directories-first "$target"; ls --group-directories-first -A "$target" | grep '^\.' )" | $menu -p "$p")"
-	ec=$?
-	[ "$ec" -ne 0 ] && exit $ec
+	ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 	if [ `echo "$sel" | wc -l` -eq 1 ]; then
 	    if [ ! -e "$target/$sel" -a $(echo "$target" | $greps "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
-		if [ ! -e "`truepath`" ]; then
-		    newt="`echo "$target" | replace`"
-		else
-		    newt="`truepath`"
-		fi
+		{ [ ! -e "`truepath`" ] && newt="`echo "$target" | backtrack`"; } ||
+		{ newt="`truepath`"; }
 	    elif [ -e "`truepath`" ] && [ ! -e "$target/$sel" -o "`echo "$target/$sel" | rev | cut -b 1-2`" = "//" ]; then
 		newt="`truepath`"
 	    else
@@ -60,17 +54,12 @@ prompt_base() {
 		if [ `echo "$target" | grep "*" | wc -l` -ge 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    IFS=
 		    ls "$PWD"/$sel 1> /dev/null 2>& 1
-		    if [ $? -ne 0 ]; then
-			target="$PWD"
-		    else
-			target=`ls -d "$PWD"/$sel`
-			cmd ; exit 0
-		    fi
+		    { [ $? -ne 0 ] && target="$PWD"; } ||
+		    { target=`ls -d "$PWD"/$sel` fullcmd; }
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
 		else
-		    target=`echo "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'`
-		    cmd ; exit 0
+		    target=`echo "$target" | head -1 && echo "$target" | tac | head -n -1 | tac | sed 's@^@'"$PWD"/'@'` fullcmd
 		fi
 	    else
 		PWD="$target"
@@ -80,50 +69,28 @@ prompt_base() {
     done
 }
 
-prompt_print() {
-    cmd () { quotes | xargs ls -d; }
-    prompt_base "$@"
-}
-
-prompt_print_contents() {
-    cmd() { quotes | xargs cat; }
-    prompt_base "$@"
-}
-
-prompt_copy() {
-    cmd() {
-	quotes | tr '\n' ' ' | xclip -r -i -selection $copy
-    }
-    prompt_base "$@"
-}
+prompt_print() { cmd () { xargs ls -d; } ; prompt_base "$@"; }
+prompt_print_contents() { cmd() { xargs cat; } ; prompt_base "$@"; }
+prompt_copy() { cmd() { tr '\n' ' ' | xclip -r -i -selection $copy; } ; prompt_base "$@"; }
 
 prompt_copy_contents() {
     cmd() {
-	if [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ]; then
-	    program="xclip -i -selection $copy -t image/png"
-	else
-	    program="xclip -r -i -selection $copy"
-	fi
-	quotes | xargs $program
-    }   
+	{ [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ] && xargs xclip -i -selection $copy -t image/png; } ||
+	{ xargs xclip -r -i -selection $copy; }
+    }
     prompt_base "$@"
 }
 
 prompt_open() {
     cmd() {
-	quotes |\
-	if [ -x "`command -v sesame`" ]; then
-	    xargs sesame
-	else
-	    xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache |\
-	    cut -d '/' -f 1)/${target##*.})
-	fi
+	{ [ -x "`command -v sesame`" ] && xargs sesame; } ||
+	{ xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache |\
+	    cut -d "/" -f 1)/${target##*.}); }
     }
     prompt_base "$@"
 }
 
-help() {
-    printf "Usage:	`basename $0` [options] [target] [prompt]
+help() { echo -n "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
   Modes:
@@ -144,8 +111,7 @@ Options:
 -h|--help           │ Print this help message and exit
 
 By default, the target and prompt will be the working directory.
-"
-}
+"; }
 
 parse_opts() {
     : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
@@ -171,7 +137,7 @@ parse_opts() {
 	    o | open)		open=1 ;;
 	    s | sensitive)	case_sensitivity="sensitive" ;;
 	    i | insensitive)	case_sensitivity="insensitive" ;;
-	    l | length)		needs_arg ; length_option=1 length_arguments=$OPTARG ;;
+	    l | length)		needs_arg ; length=$OPTARG ;;
 	    f | full)		path="full" ;;
 	    a | abbreviated)	path="abbreviated" ;;
 	    ??*)          	die "Illegal option --$OPT" ;;  # bad long option
@@ -180,8 +146,7 @@ parse_opts() {
     done
     shift $((OPTIND-1)) # remove parsed options and args from $@ list
 
-    [ -n "$1" ] && target="$1"
-    [ -z "$target" ] && target="$PWD"
+    [ -n "$1" ] && target="$1" ; [ -z "$target" ] && target="$PWD"
 
     if [ -d "$target" ]; then
 	target="`realpath -s "$target"`"
@@ -191,8 +156,7 @@ parse_opts() {
 	exit 1
     fi
 
-    [ -n "$2" ] && prompt="$2"
-    [ ! -z "$prompt" ] && [ "`realpath -s "$prompt"`" = "$target" ] && unset prompt
+    [ -n "$2" ] && prompt="$2" ; [ ! -z "$prompt" ] && [ "`realpath -s "$prompt"`" = "$target" ] && unset prompt
 }
 
 main "$@"
