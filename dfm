@@ -93,24 +93,23 @@ prompt_open() {
 help() { echo -n "Usage:	`basename $0` [options] [target] [prompt]
 
 Options:
-  Modes:
-  -p|--print        │ Print the output of the selection
-  -o|--open         │ Open the appropriate program for the selection (default)
 
-   --cat            │ Concatenate the selections before using a mode
--c|--copy           │ Copy the output of the selection (\"primary\", \"secondary\", \"clipboard\" or \"buffer-cut\")
-   --no-copy        │ Do not copy (always overrides \`--copy\`)
-                    │
--s|--sensitive      │ Use case-sensitive matching
--i|--insensitive    │ Use case-insensitive matching (default)
--l|--length         │ Specify the length of dmenu (default: 10)
-                    │
--f|--full           │ Use the full path for the prompt
--a|--abbreviated    │ Use the abbreviated path for the prompt (default)
-                    │
--h|--help           │ Print this help message and exit
+Modes:
+-p|--print       │ Print the output of the selection
+-o|--open        │ Open the appropriate program for the selection (default)
 
-By default, the target and prompt will be the working directory.
+   --cat         │ Concatenate the selections before using a mode
+-c|--copy        │ Copy the output of the selection (\`primary\`, \`secondary\`, \`clipboard\` (default), or \`buffer-cut\`)
+   --no-copy     │ Do not copy (always overrides \`--copy\`)
+                 │
+-s|--sensitive   │ Use case-sensitive matching
+-i|--insensitive │ Use case-insensitive matching (default)
+-l|--length      │ Specify the length of dmenu (default: 10)
+                 │
+-f|--full        │ Use the full path for the prompt
+-a|--abbreviated │ Use the abbreviated path for the prompt (default)
+                 │
+-h|--help        │ Print this help message and exit
 "; }
 
 parse_opts() {
@@ -121,7 +120,7 @@ parse_opts() {
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
-    while getopts hpc:osil:fa-: OPT; do
+    while getopts hpcosil:fa-: OPT; do
 	# support long options: https://stackoverflow.com/a/28466267/519360
 	if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
 	    OPT="${OPTARG%%=*}"       # extract long option name
@@ -131,7 +130,13 @@ parse_opts() {
 	case "$OPT" in
 	    h | help)     	help ; exit 0 ;;
 	    p | print)      	print=1 ;;
-	    c | copy)     	needs_arg ; copy="$OPTARG" ;;
+	    c | copy)
+		shift ; [ `printf "$OPT" | wc -c` -eq 1 ] && OPTARG="$1"
+		case "$OPTARG" in
+		    primary | secondary | clipboard | buffer-cut)	copy="$OPTARG" ;;
+		    *)							copy="clipboard" ;;
+		esac
+		[ -n "$1" -a "$OPTARG" = "$1" ] && shift ;;
 	    no-copy)		no_copy=1 ;;
 	    cat)		cat=1 ;;
 	    o | open)		open=1 ;;
