@@ -29,7 +29,7 @@ prompt_base() {
     truepath() { sh -c "realpath -s "$sel""; }
     slash() { echo "$target/$sel" | rev | cut -b 1-2; }
     check() { file -E "$@" | grep "(No such file or directory)$"; }
-    fullcmd() { echo "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
+    fullcmd() { echo -n "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
 
     while true; do
 	p="$prompt" ; [ -z "$p" ] && prompt
