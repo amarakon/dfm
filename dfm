@@ -141,7 +141,7 @@ parse_opts() {
 		    primary | secondary | clipboard | buffer-cut)	copy="$OPTARG" ;;
 		    *)							copy="clipboard" ;;
 		esac
-		[ -n "$1" -a "$OPTARG" = "$1" ] && shift ;;
+		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift ;;
 	    no-copy)		no_copy=1 ;;
 	    cat)		cat=1 ;;
 	    o | open)		open=1 ;;
