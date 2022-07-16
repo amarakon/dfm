@@ -118,8 +118,8 @@ Modes:
 "; }
 
 parse_opts() {
-    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/dfm}"
-    : "${config_file:=$config_dir/dfm.conf}"
+    : "${config_dir:=${XDG_CONFIG_HOME:-$HOME/.config}/`basename $0`}"
+    : "${config_file:=$config_dir/`basename $0`.conf}"
     [ -f "$config_file" ] && . "$config_file"
 
     die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
