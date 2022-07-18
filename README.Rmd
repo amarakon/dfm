@@ -46,7 +46,7 @@ For example, if I was in the `/home/amarakon/.local/src/amarakon/dfm` directory 
 
 #. dmenu
 #. perl (for case-insensitive matching)
-#. [sesame](https://github.com/green7ea/sesame) or xdg-utils & gtk+ (sesame is preferred because it is faster and more reliable.)
+#. [sesame](https://github.com/green7ea/sesame) or xdg-utils (sesame is preferred because it supports multi-selection and it is faster.)
 #. xclip (if you want to use the *copy* or *copy contents* features.)
 
 Most of these will probably already be installed on your system, with the exception of dmenu.

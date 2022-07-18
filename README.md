@@ -67,8 +67,8 @@ return to `amarakon`, It will return me to
 
 1.  dmenu
 2.  perl (for case-insensitive matching)
-3.  [sesame](https://github.com/green7ea/sesame) or xdg-utils & gtk+
-    (sesame is preferred because it is faster and more reliable.)
+3.  [sesame](https://github.com/green7ea/sesame) or xdg-utils (sesame is
+    preferred because it supports multi-selection and it is faster.)
 4.  xclip (if you want to use the *copy* or *copy contents* features.)
 
 Most of these will probably already be installed on your system, with

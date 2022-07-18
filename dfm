@@ -76,8 +76,8 @@ prompt_base() {
 
 prompt_print() { cmd () { xargs ls -d; } ; prompt_base "$@"; }
 prompt_print_contents() { cmd() { xargs cat; } ; prompt_base "$@"; }
+prompt_open() { cmd() { { [ -x "`command -v sesame`" ] && xargs sesame; } || { xargs xdg-open; }; } ; prompt_base "$@"; }
 prompt_copy() { cmd() { tr '\n' ' ' | xclip -r -i -selection $copy; } ; prompt_base "$@"; }
-
 prompt_copy_contents() {
     cmd() {
 	{ [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ] && xargs xclip -i -selection $copy -t image/png; } ||
@@ -86,14 +86,6 @@ prompt_copy_contents() {
     prompt_base "$@"
 }
 
-prompt_open() {
-    cmd() {
-	{ [ -x "`command -v sesame`" ] && xargs sesame; } ||
-	{ xargs gtk-launch $(xdg-mime query default $(grep /${target##*.}= /usr/share/applications/mimeinfo.cache |\
-	    cut -d "/" -f 1)/${target##*.}); }
-    }
-    prompt_base "$@"
-}
 
 help() { echo -n "Usage:	`basename $0` [options] [target] [prompt]
 
