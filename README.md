@@ -34,7 +34,7 @@ pull request if you have any issues or want any changes.
 
 ``` sh
 `# user` dfm --print # Print the output of the selection
-`# user` dfm --copy clipboard # Copy the output of the selection to the clipboard
+`# user` dfm --copy # Copy the output of the selection to the clipboard
 `# user` dfm --open # Open the appropriate program for the selection
 ```
 
