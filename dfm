@@ -1,8 +1,6 @@
 #!/bin/sh
 
-main() {
-    parse_opts "$@"
-    
+main() { parse_opts "$@"
     [ -z $mode ] && mode=open
     { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
     { [ -n "$open" ] && prompt_open "$@"; } ||
