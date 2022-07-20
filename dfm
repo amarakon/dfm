@@ -2,12 +2,12 @@
 
 main() { parse_opts "$@"
     [ -z $mode ] && mode=open
-    { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ] && prompt_copy_contents "$@"; } ||
-    { [ -n "$open" ] && prompt_open "$@"; } ||
-    { [ -n "$cat" ] && prompt_print_contents "$@"; } ||
-    { [ -n "$print" ] && prompt_print "$@"; } ||
-    { [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && prompt_copy "$@"; } ||
-    { prompt_$mode "$@"; } 
+    if [ ! -n "$no_copy" ] && [ ! -z "$copy" ] && [ -n "$cat" ]; then prompt_copy_contents "$@"
+    elif [ -n "$open" ]; then prompt_open "$@"
+    elif [ -n "$cat" ]; then prompt_print_contents "$@"
+    elif [ -n "$print" ]; then prompt_print "$@"
+    elif [ ! -n "$no_copy" ] && [ ! -z "$copy" ]; then prompt_copy "$@"
+    else prompt_$mode "$@"; fi
 }
 
 prompt_base() {
@@ -21,8 +21,8 @@ prompt_base() {
 	backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
     fi
 
-    { [ "$path" = "full" ] && prompt() { p="$target"; }; } ||
-    { prompt() { p="`echo "$target" | sed 's|^'"$HOME"'|~|'`"; }; }
+    if [ "$path" = "full" ]; then prompt() { p="$target"; }
+    else prompt() { p="`echo "$target" | sed 's|^'"$HOME"'|~|'`"; }; fi
 
     truepath() { sh -c "realpath -s "$sel""; }
     slash() { echo "$target/$sel" | rev | cut -b 1-2; }
@@ -38,8 +38,8 @@ prompt_base() {
 	    if [ -e "$target/$sel" -a "`slash`" != "//" ]; then
 		newt="`realpath -s "$target/$sel"`"
 	    elif [ ! -e "$target/$sel" -a $(echo "$target" | $grep "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
-		{ [ ! -e "`truepath`" ] && newt="`echo "$target" | backtrack`"; } ||
-		{ newt="`truepath`"; }
+		if [ ! -e "`truepath`" ]; then newt="`echo "$target" | backtrack`"
+		else newt="`truepath`"; fi
 	    elif [ -e "`truepath`" ] && [ ! -e "$target/$sel" -o "`slash`" = "//" ]; then
 		newt="`truepath`"
 	    else
@@ -55,8 +55,8 @@ prompt_base() {
 		if [ `echo "$target" | grep "*" | wc -l` -ge 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    IFS=
 		    ls "$PWD"/$sel 1> /dev/null 2>& 1
-		    { [ $? -ne 0 ] && target="$PWD"; } ||
-		    { target=`ls -d "$PWD"/$sel` fullcmd; }
+		    if [ $? -ne 0 ]; then target="$PWD"
+		    else target=`ls -d "$PWD"/$sel` fullcmd; fi
 		elif [ `echo "$target" | wc -l` -eq 1 -a `check "$target" | wc -l` -eq 1 ]; then
 		    target="$PWD"
 		elif [ `echo "$target" | wc -l` -gt 1 ]; then
@@ -74,12 +74,12 @@ prompt_base() {
 
 prompt_print() { cmd () { xargs ls -d; } ; prompt_base "$@"; }
 prompt_print_contents() { cmd() { xargs cat; } ; prompt_base "$@"; }
-prompt_open() { cmd() { { [ -x "`command -v sesame`" ] && xargs sesame; } || { xargs xdg-open; }; } ; prompt_base "$@"; }
+prompt_open() { cmd() { if [ -x "`command -v sesame`" ]; then xargs sesame; else xargs xdg-open; fi; } ; prompt_base "$@"; }
 prompt_copy() { cmd() { tr '\n' ' ' | xclip -r -i -selection $copy; } ; prompt_base "$@"; }
 prompt_copy_contents() {
     cmd() {
-	{ [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ] && xargs xclip -i -selection $copy -t image/png; } ||
-	{ xargs xclip -r -i -selection $copy; }
+	if [ "`file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2`" = "image" ]; then xargs xclip -i -selection $copy -t image/png
+	else xargs xclip -r -i -selection $copy; fi
     }
     prompt_base "$@"
 }
