@@ -41,7 +41,7 @@ prompt_base() {
 		if [ ! -e "$(truepath)" ]; then newt="$(echo "$target" | backtrack)"
 		else newt="$(truepath)"; fi
 	    elif [ -e "$(truepath)" ] && [ ! -e "$target/$sel" -o "$(slash)" = "//" ]; then
-		newt="$(truepath$)"
+		newt="$(truepath)"
 	    else
 		newt="$(realpath -s "$target/$sel")"
 	    fi
