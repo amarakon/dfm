@@ -31,7 +31,8 @@ prompt_base() {
 
     while true; do
 	p="$prompt" ; [ -z "$p" ] && prompt
-	sel="$(echo -n "$(ls --group-directories-first "$target"; ls --group-directories-first -A "$target" | grep '^\.' )" | $menu -p "$p")"
+	list() { ls --group-directories-first "$@"; }
+	sel="$(echo -n "$(list "$target"; list -A "$target" | grep '^\.')" | $menu -p "$p")"
 	ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 	if [ $(echo "$sel" | wc -l) -eq 1 ]; then
