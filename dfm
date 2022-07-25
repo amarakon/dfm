@@ -154,7 +154,7 @@ parse_opts() {
 	PWD="$target"
     elif [ ! -d "$target" ]; then
 	echo "$(basename $0): cannot access '$target': No such directory"
-	exit 1
+	exit 2
     fi
 
     [ -n "$2" ] && prompt="$2" ; [ ! -z "$prompt" ] && [ "$(realpath -s "$prompt")" = "$target" ] && unset prompt
