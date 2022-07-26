@@ -91,20 +91,21 @@ help() { echo -n "Usage:	$(basename $0) [options] [target] [prompt]
 Options:
 
 Modes:
--p|--print                │ Print the output of the selection
--o|--open                 │ Open the appropriate program for the selection (default)
+-p|--print            │ Print the output of the selection
+-o|--open             │ Open the appropriate program for the selection (default)
 
-   --cat                  │ Concatenate the selections before using a mode
--c|--copy=CLIPBOARD|false │ Copy the output of the selection (optional arguments)
-                          │
--s|--sensitive            │ Use case-sensitive matching
--i|--insensitive          │ Use case-insensitive matching (default)
--l|--length=LENGTH        │ Specify the length of dmenu (default: 10)
-                          │
--f|--full                 │ Use the full path for the prompt
--a|--abbreviated          │ Use the abbreviated path for the prompt (default)
-                          │
--h|--help                 │ Print this help message and exit
+   --cat              │ Concatenate the selections before using a mode
+-c|--copy=[CLIPBOARD] │ Copy the output of the selection
+   --no-copy          │ Do not copy (always overrides \`--copy\`)
+                      │
+-s|--sensitive        │ Use case-sensitive matching
+-i|--insensitive      │ Use case-insensitive matching (default)
+-l|--length=LENGTH    │ Specify the length of dmenu (default: 10)
+                      │
+-f|--full             │ Use the full path for the prompt
+-a|--abbreviated      │ Use the abbreviated path for the prompt (default)
+                      │
+-h|--help             │ Print this help message and exit
 "; }
 
 parse_opts() {
@@ -126,12 +127,15 @@ parse_opts() {
 	    h | help)     	help ; exit 0 ;;
 	    p | print)      	print=true ;;
 	    c | copy)
-		shift ; [ $(printf "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
+		shift
+		[ $(printf "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
 		case "$OPTARG" in
-		    primary | secondary | clipboard | buffer-cut | false)	copy="$OPTARG" ;;
-		    *)								copy="clipboard" ;;
+		    primary | secondary | clipboard | buffer-cut)	copy="$OPTARG" ;;
+		    *)							copy="clipboard" ;;
 		esac
-		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift ;;
+		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift
+		;;
+	    no-copy)		copy=false ;;
 	    cat)		cat=true ;;
 	    o | open)		open=true ;;
 	    s | sensitive)	case_sensitivity="sensitive" ;;
