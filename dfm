@@ -86,7 +86,7 @@ prompt_copy_contents() {
 }
 
 
-help() { echo -n "Usage:	$(basename $0) [options] [target] [prompt]
+help() { printf "Usage:	$(basename $0) [options] [target] [prompt]
 
 Options:
 
@@ -113,7 +113,7 @@ parse_opts() {
     : "${config_file:=$config_dir/$(basename $0).conf}"
     [ -f "$config_file" ] && . "$config_file"
 
-    die() { echo "$*" >&2; exit 2; }  # complain to STDERR and exit with error
+    die() { printf "$*\n" >&2; exit 2; }  # complain to STDERR and exit with error
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
     while getopts hpcosil:fa-: OPT; do
@@ -155,7 +155,7 @@ parse_opts() {
 	target="$(realpath -s "$target")"
 	PWD="$target"
     elif [ ! -d "$target" ]; then
-	echo "$(basename $0): cannot access '$target': No such directory"
+	printf "$(basename $0): cannot access '$target': No such directory\n"
 	exit 2
     fi
 
