@@ -22,24 +22,24 @@ prompt_base() {
     fi
 
     if [ "$path" = "full" ]; then prompt() { p="$target"; }
-    else prompt() { p="$(echo "$target" | sed 's|^'"$HOME"'|~|')"; }; fi
+    else prompt() { p="$(printf '%s' "$target" | sed 's|^'"$HOME"'|~|')"; }; fi
 
     truepath() { sh -c "realpath -s "$sel""; }
-    slash() { echo "$target/$sel" | rev | cut -b 1-2; }
+    slash() { printf '%s' "$target/$sel" | rev | cut -b 1-2; }
     check() { file -E "$@" | grep "(No such file or directory)$"; }
-    fullcmd() { echo -n "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
+    fullcmd() { printf '%s' "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
 
     while true; do
 	p="$prompt" ; [ -z "$p" ] && prompt
 	list() { ls --group-directories-first "$@"; }
-	sel="$(echo -n "$(list "$target"; list -A "$target" | grep '^\.')" | $menu -p "$p")"
+	sel="$(printf '%s' "$(list "$target"; list -A "$target" | grep '^\.')" | $menu -p "$p")"
 	ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
-	if [ $(echo "$sel" | wc -l) -eq 1 ]; then
+	if [ $(printf '%s' "$sel" | wc -l) -eq 0 ]; then
 	    if [ -e "$target/$sel" -a "$(slash)" != "//" ]; then
 		newt="$(realpath -s "$target/$sel")"
-	    elif [ ! -e "$target/$sel" -a $(echo "$target" | $grep "$(sh -c "echo "$sel"")" | wc -l) -eq 1 ]; then
-		if [ ! -e "$(truepath)" ]; then newt="$(echo "$target" | backtrack)"
+	    elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" | $grep "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]; then
+		if [ ! -e "$(truepath)" ]; then newt="$(printf '%s' "$target" | backtrack)"
 		else newt="$(truepath)"; fi
 	    elif [ -e "$(truepath)" ] && [ ! -e "$target/$sel" -o "$(slash)" = "//" ]; then
 		newt="$(truepath)"
@@ -53,15 +53,15 @@ prompt_base() {
 	if [ $(ls | wc -l) -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ $(echo "$target" | grep "*" | wc -l) -ge 1 -a $(check "$target" | wc -l) -eq 1 ]; then
+		if [ $(printf '%s' "$target" | grep "*" | wc -l) -ge 0 -a $(check "$target" | wc -l) -eq 1 ]; then
 		    IFS=
 		    ls "$PWD"/$sel 1> /dev/null 2>& 1
 		    if [ $? -ne 0 ]; then target="$PWD"
 		    else target=$(ls -d "$PWD"/$sel) fullcmd; fi
-		elif [ $(echo "$target" | wc -l) -eq 1 -a $(check "$target" | wc -l) -eq 1 ]; then
+		elif [ $(printf '%s' "$target" | wc -l) -eq 0 -a $(check "$target" | wc -l) -eq 1 ]; then
 		    target="$PWD"
-		elif [ $(echo "$target" | wc -l) -gt 1 ]; then
-		    target=$(echo "$target" | sed 's|^|'"$PWD"/'|') fullcmd
+		elif [ $(printf '%s' "$target" | wc -l) -gt 0 ]; then
+		    target=$(printf '%s' "$target" | sed 's|^|'"$PWD"/'|') fullcmd
 		else
 		    fullcmd
 		fi
