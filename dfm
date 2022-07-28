@@ -155,7 +155,7 @@ parse_opts() {
 	target="$(realpath -s "$target")"
 	PWD="$target"
     elif [ ! -d "$target" ]; then
-	printf "$(basename $0): cannot access '$target': No such directory\n"
+	printf "$(basename $0): cannot access '$target': No such directory\n" >&2
 	exit 2
     fi
 
