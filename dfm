@@ -12,6 +12,7 @@ main() { parse_opts "$@"
 
 prompt_base() {
     [ -z $length ] && length=10
+    [ "$copy" = true ] && copy="clipboard"
 
     if [ "$case_sensitivity" = "sensitive" ]; then
 	menu="dmenu -l $length" grep="grep"
@@ -131,7 +132,7 @@ parse_opts() {
 		[ $(printf "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
 		case "$OPTARG" in
 		    primary | secondary | clipboard | buffer-cut)	copy="$OPTARG" ;;
-		    *)							copy="clipboard" ;;
+		    *)							copy=true ;;
 		esac
 		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift
 		;;
