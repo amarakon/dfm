@@ -2,7 +2,8 @@
 
 main() { parse_opts "$@"
     [ -z $mode ] && mode=open
-    if [ -n "$copy" -a "$copy" != false ] && [ "$cat" = true ]; then prompt_copy_contents "$@"
+    if [ -n "$copy" -a "$copy" != false ] && [ "$cat" = true ]; then
+	prompt_copy_contents "$@"
     elif [ "$open" = true ]; then prompt_open "$@"
     elif [ "$cat" = true ]; then prompt_print_contents "$@"
     elif [ "$print" = true ]; then prompt_print "$@"
@@ -28,47 +29,52 @@ prompt_base() {
     truepath() { sh -c "realpath -s "$sel""; }
     slash() { printf '%s' "$target/$sel" | rev | cut -b 1-2; }
     check() { file -E "$@" | grep "(No such file or directory)$"; }
-    fullcmd() { printf '%s' "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd ; exit 0; }
+    fullcmd() {
+	printf '%s' "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" |
+	cmd ; exit 0
+    }
 
     while true; do
 	p="$prompt" ; [ -z "$p" ] && prompt
 	list() { ls --group-directories-first "$@"; }
-	sel="$(printf '%s' "$(list "$target"; list -A "$target" | grep '^\.')" | $menu -p "$p")"
+	sel="$(printf '%s' "$(list "$target"; list -A "$target" | grep '^\.')" |
+	    $menu -p "$p")"
 	ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 	if [ $(printf '%s' "$sel" | wc -l) -eq 0 ]; then
 	    if [ -e "$target/$sel" -a "$(slash)" != "//" ]; then
 		newt="$(realpath -s "$target/$sel")"
-	    elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" | $grep "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]; then
-		if [ ! -e "$(truepath)" ]; then newt="$(printf '%s' "$target" | backtrack)"
+	    elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" |
+		$grep "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]
+	    then
+		if [ ! -e "$(truepath)" ]; then
+		    newt="$(printf '%s' "$target" | backtrack)"
 		else newt="$(truepath)"; fi
-	    elif [ -e "$(truepath)" ] && [ ! -e "$target/$sel" -o "$(slash)" = "//" ]; then
-		newt="$(truepath)"
-	    else
-		newt="$(realpath -s "$target/$sel")"
-	    fi
-	else
-	    newt="$sel"
-	fi
+	    elif [ -e "$(truepath)" ] &&
+		[ ! -e "$target/$sel" -o "$(slash)" = "//" ]
+	    then newt="$(truepath)"
+	    else newt="$(realpath -s "$target/$sel")"; fi
+	else newt="$sel"; fi
 
 	if [ $(ls | wc -l) -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ $(printf '%s' "$target" | grep "*" | wc -l) -ge 0 -a $(check "$target" | wc -l) -eq 1 ]; then
+		if [ $(printf '%s' "$target" | grep "*" | wc -l) -ge 0 -a\
+		    $(check "$target" | wc -l) -eq 1 ]
+		then
 		    IFS=
 		    ls "$PWD"/$sel 1> /dev/null 2>& 1
 		    if [ $? -ne 0 ]; then target="$PWD"
 		    else target=$(ls -d "$PWD"/$sel) fullcmd; fi
-		elif [ $(printf '%s' "$target" | wc -l) -eq 0 -a $(check "$target" | wc -l) -eq 1 ]; then
+		elif [ $(printf '%s' "$target" | wc -l) -eq 0 -a\
+		    $(check "$target" | wc -l) -eq 1 ]
+		then
 		    target="$PWD"
 		elif [ $(printf '%s' "$target" | wc -l) -gt 0 ]; then
-		    target=$(printf '%s' "$target" | sed 's|^|'"$PWD"/'|') fullcmd
-		else
+		    target=$(printf '%s' "$target" | sed 's|^|'"$PWD"/'|')
 		    fullcmd
-		fi
-	    else
-		PWD="$target"
-	    fi
+		else fullcmd; fi
+	    else PWD="$target"; fi
 	fi
 
     done
@@ -76,18 +82,31 @@ prompt_base() {
 
 prompt_print() { cmd () { xargs ls -d; } ; prompt_base "$@"; }
 prompt_print_contents() { cmd() { xargs cat; } ; prompt_base "$@"; }
-prompt_open() { cmd() { if [ -x "$(command -v sesame)" ]; then xargs sesame; else xargs xdg-open; fi; } ; prompt_base "$@"; }
-prompt_copy() { cmd() { tr '\n' ' ' | xclip -r -i -selection $copy; } ; prompt_base "$@"; }
+
+prompt_open() {
+    cmd() {
+	if [ -x "$(command -v sesame)" ]; then xargs sesame
+	else xargs xdg-open; fi
+    }
+    prompt_base "$@"
+}
+
+prompt_copy() {
+    cmd() { tr '\n' ' ' | xclip -r -i -selection $copy; }
+    prompt_base "$@"
+}
+
 prompt_copy_contents() {
     cmd() {
-	if [ "$(file -b "$target" | cut -d ',' -f1 | cut -d ' ' -f2)" = "image" ]; then xargs xclip -i -selection $copy -t image/png
+	if [ "$(file -b "$target" | cut -d " " -f2)" = "image" ]; then
+	    xargs xclip -i -selection $copy -t image/png
 	else xargs xclip -r -i -selection $copy; fi
     }
     prompt_base "$@"
 }
 
 
-help() { printf "Usage:	$(basename $0) [options] [target] [prompt]
+help() { printf 'Usage:\t%s' "$(basename $0) [options] [target] [prompt]
 
 Options:
 
@@ -114,15 +133,15 @@ parse_opts() {
     : "${config_file:=$config_dir/$(basename $0).conf}"
     [ -f "$config_file" ] && . "$config_file"
 
-    die() { printf "$*\n" >&2; exit 2; }  # complain to STDERR and exit with error
+    die() { printf "$*\n" >&2; exit 2; }
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
     while getopts hpcosil:fa-: OPT; do
-	# support long options: https://stackoverflow.com/a/28466267/519360
-	if [ "$OPT" = "-" ]; then   # long option: reformulate OPT and OPTARG
-	    OPT="${OPTARG%%=*}"       # extract long option name
-	    OPTARG="${OPTARG#$OPT}"   # extract long option argument (may be empty)
-	    OPTARG="${OPTARG#=}"      # if long option argument, remove assigning `=`
+	# Support long options: https://stackoverflow.com/a/28466267/519360
+	if [ "$OPT" = "-" ]; then
+	    OPT="${OPTARG%%=*}"
+	    OPTARG="${OPTARG#$OPT}"
+	    OPTARG="${OPTARG#=}"
 	fi
 	case "$OPT" in
 	    h | help)     	help ; exit 0 ;;
@@ -131,8 +150,10 @@ parse_opts() {
 		shift
 		[ $(printf "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
 		case "$OPTARG" in
-		    primary | secondary | clipboard | buffer-cut)	copy="$OPTARG" ;;
-		    *)							copy=true ;;
+		    primary | secondary | clipboard | buffer-cut)
+			copy="$OPTARG"
+			;;
+		    *)	copy=true ;;
 		esac
 		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift
 		;;
@@ -144,11 +165,11 @@ parse_opts() {
 	    l | length)		needs_arg ; length=$OPTARG ;;
 	    f | full)		path="full" ;;
 	    a | abbreviated)	path="abbreviated" ;;
-	    ??*)          	die "Illegal option --$OPT" ;;  # bad long option
-	    ?)            	exit 2 ;;  # bad short option (error reported via getopts)
+	    ??*)          	die "Illegal option --$OPT" ;;
+	    ?)            	exit 2 ;;
 	esac
     done
-    shift $((OPTIND-1)) # remove parsed options and args from $@ list
+    shift $((OPTIND-1))
 
     [ -n "$1" ] && target="$1" ; [ -z "$target" ] && target="$PWD"
 
@@ -156,11 +177,14 @@ parse_opts() {
 	target="$(realpath -s "$target")"
 	PWD="$target"
     elif [ ! -d "$target" ]; then
-	printf "$(basename $0): cannot access '$target': No such directory\n" >&2
+	printf "$(basename $0): \`$target\` is not a directory.\n" >&2
 	exit 2
     fi
 
-    [ -n "$2" ] && prompt="$2" ; [ ! -z "$prompt" ] && [ "$(realpath -s "$prompt")" = "$target" ] && unset prompt
+    [ -n "$2" ] && prompt="$2"
+    if [ -n "$prompt" ] && [ "$(realpath -s "$prompt")" = "$target" ]; then
+	unset prompt
+    fi
 }
 
 main "$@"
