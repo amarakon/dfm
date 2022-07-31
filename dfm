@@ -59,7 +59,7 @@ prompt_base() {
 	if [ $(ls | wc -l) -ge 1 ]; then
 	    target="$newt"
 	    if [ ! -d "$target" ]; then
-		if [ $(printf '%s' "$target" | grep "*" | wc -l) -ge 0 -a\
+		if [ $(printf '%s' "$target" | grep "*" | wc -l) -ge 1 -a\
 		    $(check "$target" | wc -l) -eq 1 ]
 		then
 		    IFS=
