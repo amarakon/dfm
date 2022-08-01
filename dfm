@@ -134,8 +134,10 @@ parse_opts() {
     [ -f "$config_file" ] && . "$config_file"
 
     needs_arg() {
-	[ -z "$OPTARG" ] && printf '%s\n' "No arg for --$OPT option" >&2
-	exit 2
+	if [ -z "$OPTARG" ]; then
+	    printf '%s\n' "No arg for --$OPT option" >&2
+	    exit 2
+	fi
     }
 
     while getopts hpcosil:fa-: OPT; do
