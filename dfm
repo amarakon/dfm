@@ -148,8 +148,8 @@ parse_opts() {
 	    OPTARG="${OPTARG#=}"
 	fi
 	case "$OPT" in
-	    h | help)     	help ; exit 0 ;;
-	    p | print)      	print=true ;;
+	    h | help) help ; exit 0 ;;
+	    p | print) print=true ;;
 	    c | copy)
 		shift
 		[ $(printf '%s' "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
@@ -161,19 +161,19 @@ parse_opts() {
 		esac
 		[ -n "$1" -a "$OPTARG" = "$1" -a "$copy" = "$OPTARG" ] && shift
 		;;
-	    no-copy)		copy=false ;;
-	    cat)		cat=true ;;
-	    o | open)		open=true ;;
-	    s | sensitive)	case_sensitivity="sensitive" ;;
-	    i | insensitive)	case_sensitivity="insensitive" ;;
-	    l | length)		needs_arg ; length=$OPTARG ;;
-	    f | full)		path="full" ;;
-	    a | abbreviated)	path="abbreviated" ;;
+	    no-copy) copy=false ;;
+	    cat) cat=true ;;
+	    o | open) open=true ;;
+	    s | sensitive) case_sensitivity="sensitive" ;;
+	    i | insensitive) case_sensitivity="insensitive" ;;
+	    l | length) needs_arg ; length=$OPTARG ;;
+	    f | full) path="full" ;;
+	    a | abbreviated) path="abbreviated" ;;
 	    ??*)
 		printf '%s\n' "Illegal option --$OPT" >&2
 		exit 2
 		;;
-	    ?)            	exit 2 ;;
+	    ?) exit 2 ;;
 	esac
     done
     shift $((OPTIND-1))
