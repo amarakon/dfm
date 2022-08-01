@@ -31,7 +31,7 @@ prompt_base() {
     check() { file -E "$@" | grep "(No such file or directory)$"; }
     fullcmd() {
 	printf '%s' "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" |
-	cmd ; exit 0
+	    cmd
     }
 
     while true; do
@@ -65,15 +65,15 @@ prompt_base() {
 		    IFS=
 		    ls "$PWD"/$sel 1> /dev/null 2>& 1
 		    if [ $? -ne 0 ]; then target="$PWD"
-		    else target=$(ls -d "$PWD"/$sel) fullcmd; fi
+		    else target=$(ls -d "$PWD"/$sel) fullcmd ; exit 0; fi
 		elif [ $(printf '%s' "$target" | wc -l) -eq 0 -a\
 		    $(check "$target" | wc -l) -eq 1 ]
 		then
 		    target="$PWD"
 		elif [ $(printf '%s' "$target" | wc -l) -gt 0 ]; then
 		    target=$(printf '%s' "$target" | sed 's|^|'"$PWD"/'|')
-		    fullcmd
-		else fullcmd; fi
+		    fullcmd ; exit 0
+		else fullcmd ; exit 0; fi
 	    else PWD="$target"; fi
 	fi
 
