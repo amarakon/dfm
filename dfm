@@ -133,7 +133,7 @@ parse_opts() {
     : "${config_file:=$config_dir/$(basename $0).conf}"
     [ -f "$config_file" ] && . "$config_file"
 
-    die() { printf "$*\n" >&2; exit 2; }
+    die() { printf '%s\n' "$*" >&2 ; exit 2; }
     needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
 
     while getopts hpcosil:fa-: OPT; do
@@ -148,7 +148,7 @@ parse_opts() {
 	    p | print)      	print=true ;;
 	    c | copy)
 		shift
-		[ $(printf "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
+		[ $(printf '%s' "$OPT" | wc -c) -eq 1 ] && OPTARG="$1"
 		case "$OPTARG" in
 		    primary | secondary | clipboard | buffer-cut)
 			copy="$OPTARG"
@@ -177,7 +177,7 @@ parse_opts() {
 	target="$(realpath -s "$target")"
 	PWD="$target"
     elif [ ! -d "$target" ]; then
-	printf "$(basename $0): \`$target\` is not a directory.\n" >&2
+	printf '%s\n' "$(basename $0): \`$target\` is not a directory." >&2
 	exit 2
     fi
 
