@@ -133,8 +133,10 @@ parse_opts() {
     : "${config_file:=$config_dir/$(basename $0).conf}"
     [ -f "$config_file" ] && . "$config_file"
 
-    die() { printf '%s\n' "$*" >&2 ; exit 2; }
-    needs_arg() { [ -z "$OPTARG" ] && die "No arg for --$OPT option"; }
+    needs_arg() {
+	[ -z "$OPTARG" ] && printf '%s\n' "No arg for --$OPT option" >&2
+	exit 2
+    }
 
     while getopts hpcosil:fa-: OPT; do
 	# Support long options: https://stackoverflow.com/a/28466267/519360
@@ -165,7 +167,10 @@ parse_opts() {
 	    l | length)		needs_arg ; length=$OPTARG ;;
 	    f | full)		path="full" ;;
 	    a | abbreviated)	path="abbreviated" ;;
-	    ??*)          	die "Illegal option --$OPT" ;;
+	    ??*)
+		printf '%s\n' "Illegal option --$OPT" >&2
+		exit 2
+		;;
 	    ?)            	exit 2 ;;
 	esac
     done
