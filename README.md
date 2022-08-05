@@ -36,6 +36,7 @@ pull request if you have any issues or want any changes.
 `# user` dfm --print # Print the output of the selection
 `# user` dfm --copy # Copy the output of the selection to the clipboard
 `# user` dfm --open # Open the appropriate program for the selection
+`# user` dfm --menu=fzf # Change the menu command from `dmenu` to `fzf`
 ```
 
 The default is the `open` option.
@@ -120,6 +121,7 @@ usually `~/.config/dfm/dfm.conf`. Here is an example configuration:
 copy=clipboard
 cat=true
 case_sensitivity=sensitive
+menu=fzf
 length=30
 path=full
 ```

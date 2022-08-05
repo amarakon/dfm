@@ -16,12 +16,16 @@ prompt_base() {
 	[ "$copy" = true ] && copy="clipboard"
 
 	if [ "$case_sensitivity" = "sensitive" ]; then
-		menu="dmenu -l $length" grep="grep"
-		backtrack() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; }
-	else
-		menu="dmenu -i -l $length" grep="grep -i"
-		backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; }
-	fi
+		backtrack() { sed 's|\(.*/'$sel'[^/]*\).*|\1|'; } ; s=+i
+	else backtrack() { perl -pe 's|(.*/'$sel'[^/]*).*|$1|i'; } ; i=-i; fi
+
+	[ -z "$menu" ] && menu="dmenu"
+	if [ "$menu" = dmenu ]; then menu() { $menu $i -l $length -p "$@"; }
+	elif [ "$menu" = fzf ]; then
+		menu() {
+			$menu $s $i --header="$@" --tabstop=4 --multi --no-sort --exact
+		}
+	else menu() { $menu; }; fi
 
 	if [ "$path" = "full" ]; then prompt() { p="$target"; }
 	else prompt() { p="$(printf '%s' "$target" | sed 's|^'"$HOME"'|~|')"; }; fi
@@ -38,14 +42,14 @@ prompt_base() {
 		p="$prompt" ; [ -z "$p" ] && prompt
 		list() { ls --group-directories-first "$@"; }
 		sel="$(printf '%s' "$(list "$target"; list -A "$target" | grep '^\.')" |
-			$menu -p "$p")"
+			menu "$p")"
 		ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 		if [ $(printf '%s' "$sel" | wc -l) -eq 0 ]; then
 			if [ -e "$target/$sel" -a "$(slash)" != "//" ]; then
 				newt="$(realpath -s "$target/$sel")"
 			elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" |
-				$grep "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]
+				grep $i "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]
 	    	then
 				if [ ! -e "$(truepath)" ]; then
 					newt="$(printf '%s' "$target" | backtrack)"
@@ -118,6 +122,7 @@ Modes:
                       │
 -s|--sensitive        │ Use case-sensitive matching
 -i|--insensitive      │ Use case-insensitive matching (default)
+-m|--menu=MENU        │ Choose which menu program to use (default: dmenu)
 -l|--length=LENGTH    │ Specify the length of dmenu (default: 10)
                       │
 -f|--full             │ Use the full path for the prompt
@@ -138,7 +143,7 @@ parse_opts() {
 		fi
 	}
 
-	while getopts hpcosil:fa-: OPT; do
+	while getopts hpcosim:l:fa-: OPT; do
 		# Support long options: https://stackoverflow.com/a/28466267/519360
 		if [ "$OPT" = "-" ]; then
 			OPT="${OPTARG%%=*}"
@@ -164,6 +169,7 @@ parse_opts() {
 			o | open) open=true ;;
 			s | sensitive) case_sensitivity="sensitive" ;;
 			i | insensitive) case_sensitivity="insensitive" ;;
+			m | menu) needs_arg ; menu="$OPTARG" ;;
 			l | length) needs_arg ; length=$OPTARG ;;
 			f | full) path="full" ;;
 			a | abbreviated) path="abbreviated" ;;
