@@ -26,11 +26,12 @@ Please submit an issue or a pull request if you have any issues or want any chan
 The default is the `open` option.
 
 To select one file, press the `Return` key.
-To use the input instead of the selection, press `Shift+Return` (not necessary most of the time).
-To select multiple files, press `Control+Return` on each selection and press `Return` when you are finished. (This requires the [multi-selection](https://tools.suckless.org/dmenu/patches/multi-selection/) dmenu patch.)
+To use the input instead of the selection, press `Shift-Return` (not necessary most of the time).
+To select multiple files, press `Control-Return` on each selection and press `Return` when you are finished. (This requires the [multi-selection](https://tools.suckless.org/dmenu/patches/multi-selection/) dmenu patch.)
 To select all the files, type `*`.
 To go to the home directory, type `~`.
-To go back a directory, type `..`.
+To go back a directory, type `..` or press `Shift-Return` without typing
+anything.
 To go to the `/` directory, type `/`.
 
 ## Backtrack
