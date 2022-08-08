@@ -46,7 +46,8 @@ prompt_base() {
 		ec=$? ; [ "$ec" -ne 0 ] && exit $ec
 
 		if [ $(printf '%s' "$sel" | wc -l) -eq 0 ]; then
-			if [ -e "$target/$sel" -a "$(slash)" != "//" ]; then
+			if [ "$sel" = "" ]; then newt="$(realpath -s "$target/..")"
+			elif [ -e "$target/$sel" -a "$(slash)" != "//" ]; then
 				newt="$(realpath -s "$target/$sel")"
 			elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" |
 				grep $i "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]
