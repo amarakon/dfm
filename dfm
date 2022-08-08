@@ -50,7 +50,7 @@ prompt_base() {
 				newt="$(realpath -s "$target/$sel")"
 			elif [ ! -e "$target/$sel" -a $(printf '%s' "$target" |
 				grep $i "$(sh -c "printf '%s' "$sel"")" | wc -l) -eq 1 ]
-	    	then
+			then
 				if [ ! -e "$(truepath)" ]; then
 					newt="$(printf '%s' "$target" | backtrack)"
 				else newt="$(truepath)"; fi
