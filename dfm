@@ -30,6 +30,15 @@ prompt_base() {
 	if [ "$path" = "full" ]; then prompt() { p="$target"; }
 	else prompt() { p="$(printf '%s' "$target" | sed 's|^'"$HOME"'|~|')"; }; fi
 
+	if [ "$(ls --version | head -1 | cut -d " " -f 2-3)" = "(GNU coreutils)" ]
+	then list() { ls --group-directories-first "$@"; }
+	else
+		list() {
+			(ls -l "$@" | grep "^d" ; ls -l "$@" | grep -vE "^d|^total") |
+				tr -s " " | cut -d " " -f 9-
+		}
+	fi
+
 	truepath() { sh -c "realpath -s "$sel""; }
 	slash() { printf '%s' "$target/$sel" | rev | cut -b 1-2; }
 	check() { file -E "$@" | grep "(No such file or directory)$"; }
@@ -40,7 +49,6 @@ prompt_base() {
 
 	while true; do
 		p="$prompt" ; [ -z "$p" ] && prompt
-		list() { ls --group-directories-first "$@"; }
 		sel="$(printf '%s' "$(list "$target"; list -A "$target" | grep '^\.')" |
 			menu "$p")"
 		ec=$? ; [ "$ec" -ne 0 ] && exit $ec
