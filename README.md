@@ -3,18 +3,18 @@ DFM – dmenu File Manager
 
 ## Contents
 
--   [Introduction](#introduction)
--   [Usage](#usage)
-    -   [Backtrack](#backtrack)
--   [Dependencies](#dependencies)
--   [Installation](#installation)
-    -   [Universal](#universal)
-    -   [Gentoo](#gentoo)
--   [Uninstallation](#uninstallation)
-    -   [Universal](#universal-1)
-    -   [Gentoo](#gentoo-1)
--   [Configuration](#configuration)
--   [Credit](#credit)
+-   <a href="#introduction" id="toc-introduction">Introduction</a>
+-   <a href="#usage" id="toc-usage">Usage</a>
+    -   <a href="#backtrack" id="toc-backtrack">Backtrack</a>
+-   <a href="#dependencies" id="toc-dependencies">Dependencies</a>
+-   <a href="#installation" id="toc-installation">Installation</a>
+    -   <a href="#universal" id="toc-universal">Universal</a>
+    -   <a href="#gentoo" id="toc-gentoo">Gentoo</a>
+-   <a href="#uninstallation" id="toc-uninstallation">Uninstallation</a>
+    -   <a href="#universal-1" id="toc-universal-1">Universal</a>
+    -   <a href="#gentoo-1" id="toc-gentoo-1">Gentoo</a>
+-   <a href="#configuration" id="toc-configuration">Configuration</a>
+-   <a href="#credit" id="toc-credit">Credit</a>
 
 ## Introduction
 
@@ -41,15 +41,16 @@ pull request if you have any issues or want any changes.
 
 The default is the `open` option.
 
-To select one file, press the `Return` key. To use the input instead of
-the selection, press `Shift-Return` (not necessary most of the time). To
-select multiple files, press `Control-Return` on each selection and
-press `Return` when you are finished. (This requires the
+To select one file, press the <kbd>Return</kbd> key. To use the input
+instead of the selection, press <kbd>Shift</kbd><kbd>Return</kbd> (not
+necessary most of the time). To select multiple files, press
+<kbd>Control</kbd><kbd>Return</kbd> on each selection and press
+<kbd>Return</kbd> when you are finished. (This requires the
 [multi-selection](https://tools.suckless.org/dmenu/patches/multi-selection/)
 dmenu patch.) To select all the files, type `*`. To go to the home
 directory, type `~`. To go back a directory, type `..` or press
-`Shift-Return` without typing anything. To go to the `/` directory, type
-`/`.
+<kbd>Shift</kbd><kbd>Return</kbd> without typing anything. To go to the
+`/` directory, type `/`.
 
 ### Backtrack
 
@@ -57,12 +58,12 @@ A cool new feature I added is to quickly backtrack to any directory.
 This allows you to type a directory you passed in the prompt to return
 to it instead of constantly doing `..`. If you are in the
 `/home/amarakon/.local/src/amarakon/dfm` directory, you can type
-`.local` in the prompt and press `Return` to quickly backtrack to the
-`/home/amarakon/.local` directory. You do not even need to type the full
-name! You can type `.l` instead of `.local` for example. If there is
-more than one match, it will use the closest one. For example, if I was
-in the `/home/amarakon/.local/src/amarakon/dfm` directory and I chose to
-return to `amarakon`, It will return me to
+`.local` in the prompt and press <kbd>Return</kbd> to quickly backtrack
+to the `/home/amarakon/.local` directory. You do not even need to type
+the full name! You can type `.l` instead of `.local` for example. If
+there is more than one match, it will use the closest one. For example,
+if I was in the `/home/amarakon/.local/src/amarakon/dfm` directory and I
+chose to return to `amarakon`, It will return me to
 `/home/amarakon/.local/src/amarakon`.
 
 ## Dependencies
