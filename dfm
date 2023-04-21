@@ -116,7 +116,6 @@ prompt_base() {
 										target="$PWD"
 									# Target is a wildcard
 									else
-										echo lol
 										target=$(ls -d "$PWD"/$sel) fullcmd
 										exit 0
 									fi
