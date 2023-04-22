@@ -3,18 +3,18 @@ DFM – dmenu File Manager
 
 ## Contents
 
--   <a href="#introduction" id="toc-introduction">Introduction</a>
--   <a href="#usage" id="toc-usage">Usage</a>
-    -   <a href="#backtrack" id="toc-backtrack">Backtrack</a>
--   <a href="#dependencies" id="toc-dependencies">Dependencies</a>
--   <a href="#installation" id="toc-installation">Installation</a>
-    -   <a href="#universal" id="toc-universal">Universal</a>
-    -   <a href="#gentoo" id="toc-gentoo">Gentoo</a>
--   <a href="#uninstallation" id="toc-uninstallation">Uninstallation</a>
-    -   <a href="#universal-1" id="toc-universal-1">Universal</a>
-    -   <a href="#gentoo-1" id="toc-gentoo-1">Gentoo</a>
--   <a href="#configuration" id="toc-configuration">Configuration</a>
--   <a href="#credit" id="toc-credit">Credit</a>
+- [Introduction](#introduction)
+- [Usage](#usage)
+  - [Backtrack](#backtrack)
+- [Dependencies](#dependencies)
+- [Installation](#installation)
+  - [Universal](#universal)
+  - [Gentoo](#gentoo)
+- [Uninstallation](#uninstallation)
+  - [Universal](#universal-1)
+  - [Gentoo](#gentoo-1)
+- [Configuration](#configuration)
+- [Credit](#credit)
 
 ## Introduction
 
@@ -37,6 +37,7 @@ pull request if you have any issues or want any changes.
 `# user` dfm --copy # Copy the output of the selection to the clipboard
 `# user` dfm --open # Open the appropriate program for the selection
 `# user` dfm --menu=fzf # Change the menu command from `dmenu` to `fzf`
+`# user` dfm --restore # Restore the location of the previous run
 ```
 
 The default is the `open` option.

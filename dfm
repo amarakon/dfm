@@ -69,7 +69,10 @@ prompt_base() {
 
 		# Exit if the user presses Escape, Control-C, etc.
 		exit_code=$?
-		[ "$exit_code" -ne 0 ] && exit $exit_code
+		if [ "$exit_code" -ne 0 ]; then
+			printf '%s\n' "$target" > "$cache_file"
+			exit $exit_code
+		fi
 
 		if [ $(printf '%s' "$sel" | wc -l) -eq 0 ]; then
 			# If the input box is empty, go to the parent directory
@@ -100,6 +103,8 @@ prompt_base() {
 		else
 			newt="$sel"
 		fi
+
+		printf '%s\n' "$newt" > "$cache_file"
 
 		# If the current working directory is not empty
 		if [ $(ls | wc -l) -ge 1 ]; then
@@ -185,6 +190,7 @@ Modes:
 -c|--copy=[CLIPBOARD] │ Copy the output of the selection
    --no-copy          │ Do not copy (always overrides \`--copy\`)
                       │
+-r|--restore          │ Start from the previous path restored from the last run
 -s|--sensitive        │ Use case-sensitive matching
 -i|--insensitive      │ Use case-insensitive matching (default)
 -m|--menu=MENU        │ Choose which menu program to use (default: dmenu)
@@ -201,6 +207,14 @@ parse_opts() {
 	: "${config_file:=$config_dir/$PROGRAM_NAME.conf}"
 	[ -f "$config_file" ] && . "$config_file"
 
+	: "${cache_dir:=${XDG_CACHE_DIR:-$HOME/.cache}/$PROGRAM_NAME}"
+	: "${cache_file:=$cache_dir/path}"
+	# Create the cache file if it doesn't exist
+	if [ ! -f "$cache_file" ]; then
+		mkdir -p "$(dirname "$cache_file")" &&
+			touch "$cache_file"
+	fi
+
 	needs_arg() {
 		if [ -z "$OPTARG" ]; then
 			printf '%s\n' "No arg for --$OPT option" >&2
@@ -208,7 +222,7 @@ parse_opts() {
 		fi
 	}
 
-	while getopts hpcosim:l:fa-: OPT; do
+	while getopts hpcosim:l:far-: OPT; do
 		# Support long options: https://stackoverflow.com/a/28466267/519360
 		if [ "$OPT" = "-" ]; then
 			OPT="${OPTARG%%=*}"
@@ -265,6 +279,9 @@ parse_opts() {
 			a|abbreviated)
 				path="abbreviated"
 				;;
+			r|restore)
+				restore=true
+				;;
 			??*)
 				printf '%s\n' "Illegal option --$OPT" >&2
 				exit 2
@@ -276,8 +293,14 @@ parse_opts() {
 	done
 	shift $((OPTIND-1)) # Remove option arguments from the argument list
 
-	if [ -n "$1" ]; then target="$1"
-	elif [ -z "$target" ]; then target="$PWD"
+	if [ -n "$1" ]; then
+		target="$1"
+	elif [ -z "$target" ]; then
+		if [ "$restore" = true -a -s "$cache_file" ]; then
+			target="$(cat "$cache_file")"
+		else
+			target="$PWD"
+		fi
 	fi
 
 	if [ -d "$target" ]; then

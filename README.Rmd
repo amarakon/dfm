@@ -23,6 +23,7 @@ issues or want any changes.
 `# user` dfm --copy # Copy the output of the selection to the clipboard
 `# user` dfm --open # Open the appropriate program for the selection
 `# user` dfm --menu=fzf # Change the menu command from `dmenu` to `fzf`
+`# user` dfm --restore # Restore the location of the previous run
 ```
 
 The default is the `open` option.
