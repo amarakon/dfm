@@ -70,7 +70,11 @@ prompt_base() {
 		# Exit if the user presses Escape, Control-C, etc.
 		exit_code=$?
 		if [ "$exit_code" -ne 0 ]; then
-			printf '%s\n' "$target" > "$cache_file"
+            if [ -f "$target" ]; then
+                printf '%s\n' "$(dirname "$(realpath -s "$target")")" > "$cache_file"
+            else
+                printf '%s\n' "$target" > "$cache_file"
+            fi
 			exit $exit_code
 		fi
 
@@ -104,7 +108,11 @@ prompt_base() {
 			newt="$sel"
 		fi
 
-		printf '%s\n' "$newt" > "$cache_file"
+        if [ -f "$newt" ]; then
+            printf '%s\n' "$(dirname "$(realpath -s "$newt")")" > "$cache_file"
+        else
+            printf '%s\n' "$newt" > "$cache_file"
+        fi
 
 		# If the current working directory is not empty
 		if [ $(ls | wc -l) -ge 1 ]; then
