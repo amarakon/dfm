@@ -18,7 +18,7 @@ DFM – dmenu File Manager
 
 ## Introduction
 
-![](preview.gif)
+![](https://i.imgur.com/wQAW8BD.mp4)
 
 DFM is a simple file manager that uses dmenu. Instead of opening a slow
 graphical environment, you open dmenu and quickly choose whatever file
