@@ -86,6 +86,11 @@ the exception of dmenu.
 `# root` make install
 ```
 
+### Arch
+
+Install the [dmenu-dfm](https://aur.archlinux.org/packages/dmenu-dfm) AUR
+package.
+
 ### Gentoo
 
 ``` sh
@@ -102,6 +107,11 @@ the exception of dmenu.
 `# user` cd dfm
 `# root` make uninstall
 ```
+
+### Arch
+
+Uninstall the [dmenu-dfm](https://aur.archlinux.org/packages/dmenu-dfm) AUR
+package.
 
 ### Gentoo
 
