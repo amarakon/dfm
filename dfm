@@ -315,6 +315,8 @@ parse_opts() {
 		target="$(realpath -s "$target")"
 		PWD="$target"
 	else
+        # Zero out cache file.
+        [ "$restore" = true -a -s "$cache_file" ] && > "$cache_file"
 		printf '%s\n' "$PROGRAM_NAME: \`$target\` is not a directory." >&2
 		exit 2
 	fi
