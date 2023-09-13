@@ -56,6 +56,7 @@ prompt_base() {
 	slash() { printf '%s' "$target/$sel" | rev | cut -b 1-2; }
 	check() { file -E "$@" | grep "(No such file or directory)$"; }
 	fullcmd() {
+		printf '%s\n' "$PWD" > "$cache_file"
 		printf '%s' "$target" | sed -e "s/'/'\\\\''/g;s/\(.*\)/'\1'/" | cmd
 	}
 
@@ -70,11 +71,7 @@ prompt_base() {
 		# Exit if the user presses Escape, Control-C, etc.
 		exit_code=$?
 		if [ "$exit_code" -ne 0 ]; then
-            if [ -f "$target" ]; then
-                printf '%s\n' "$(dirname "$(realpath -s "$target")")" > "$cache_file"
-            else
-                printf '%s\n' "$target" > "$cache_file"
-            fi
+			printf '%s\n' "$target" > "$cache_file"
 			exit $exit_code
 		fi
 
@@ -107,12 +104,6 @@ prompt_base() {
 		else
 			newt="$sel"
 		fi
-
-        if [ -f "$newt" ]; then
-            printf '%s\n' "$(dirname "$(realpath -s "$newt")")" > "$cache_file"
-        else
-            printf '%s\n' "$newt" > "$cache_file"
-        fi
 
 		# If the current working directory is not empty
 		if [ $(ls | wc -l) -ge 1 ]; then
@@ -315,6 +306,8 @@ parse_opts() {
 		target="$(realpath -s "$target")"
 		PWD="$target"
 	else
+		# Zero out cache file.
+		[ "$restore" = true -a -s "$cache_file" ] && > "$cache_file"
 		printf '%s\n' "$PROGRAM_NAME: \`$target\` is not a directory." >&2
 		exit 2
 	fi
