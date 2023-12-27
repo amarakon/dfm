@@ -138,6 +138,13 @@ prompt_base() {
 					fullcmd
 					exit
 				fi
+			# Target is a dollar sign, open TERMINAL
+			elif [ $(printf '%s' "$sel" | grep '\$' | wc -l) -gt 0 -a\
+				"$open" = true ]
+						then
+							exec $TERMINAL -- sh -c "cd '$PWD'; exec $SHELL" &> /dev/null &
+							printf '%s\n' "$PWD" > "$cache_file"
+							exit
 			# Target is a directory
 			else
 				PWD="$target"
